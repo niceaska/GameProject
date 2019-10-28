@@ -10,14 +10,7 @@
         android:id="@+id/button_left_choice"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:background="@drawable/buttton_drawable"
-        android:padding="16dp"
-        android:text="You"
-        android:textAllCaps="false"
-        android:textColor="#fff"
-        android:textSize="16sp"
+        style="@style/button_style"
         app:layout_constraintWidth_percent="0.48"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,19 +20,11 @@
         android:id="@+id/button_right_choice"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:background="@drawable/buttton_drawable"
-        android:padding="16dp"
-        android:text="You need"
-        android:textAllCaps="false"
-        android:textColor="#fff"
-        android:textSize="16sp"
         app:layout_constraintWidth_percent="0.48"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/button_style" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
