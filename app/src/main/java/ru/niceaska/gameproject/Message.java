@@ -1,19 +1,40 @@
 package ru.niceaska.gameproject;
 
-public class Message {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Message extends ListItem implements Parcelable {
 
     private String message;
     private long time;
     private boolean isGamer;
-    private boolean isChoice;
     private int timeToNext;
 
-    public Message(String message, long time, boolean isGamer, boolean isChoice) {
+    public Message(String message, long time, boolean isGamer) {
         this.message = message;
         this.time = time;
         this.isGamer = isGamer;
-        this.isChoice = isChoice;
+        this.timeToNext = 0;
     }
+
+    protected Message(Parcel in) {
+        message = in.readString();
+        time = in.readLong();
+        isGamer = in.readByte() != 0;
+        timeToNext = in.readInt();
+    }
+
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
+        @Override
+        public Message createFromParcel(Parcel in) {
+            return new Message(in);
+        }
+
+        @Override
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
 
     public String getMessage() {
         return message;
@@ -39,19 +60,24 @@ public class Message {
         isGamer = gamer;
     }
 
-    public boolean isChoice() {
-        return isChoice;
-    }
-
-    public void setChoice(boolean choice) {
-        isChoice = choice;
-    }
-
     public int getTimeToNext() {
         return timeToNext;
     }
 
     public void setTimeToNext(int timeToNext) {
         this.timeToNext = timeToNext;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(message);
+        dest.writeLong(time);
+        dest.writeByte((byte) (isGamer ? 1 : 0));
+        dest.writeInt(timeToNext);
     }
 }

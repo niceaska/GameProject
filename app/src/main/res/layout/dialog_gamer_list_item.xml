@@ -1,48 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/text_message_name"
-        android:text="John Doe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
+        android:layout_width="56dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:text="You"
         android:textColor="#ffffff"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="8dp" />
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_message_body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/message_body_drawbale"
+        android:background="@drawable/messgae_gamer_drawable"
         android:padding="8dp"
         android:text="Я впервые в жизни дышал таким воздухом - это был замешанный на выхлопных газах запах Свободы. Я волен был идти туда и делать то, что считаю нужным, а не только то, чего от меня ожидают. Шли недели, но эйфория никак не спадала. Семнадцать лет я провел то в одном, то в другом неизменно крохотном помещении в компании забитой тени пустой женщины, бывшей моей матерью, и Отца. Впервые надежда на освобождение замерцала во мне. Все, что мне было нужно, - это финансовая независимость. Я стоял вечером на балконе, обдумывал свои планы найти подработку переводчиком\копирайтером и курил сигарету - необычайно вкусную оттого, что я мог курить ее не украдкой. В этот момент я и заметил нечто неладное. Как я уже говорил, дом этот длинный, и одна его сторона поворачивает буквой П, образуя небольшой дворик - так что я видел окна собственного дома практически напротив. "
         android:textColor="#ffffff"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintLeft_toRightOf="@id/guideline"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_message_name" />
 
     <TextView
         android:id="@+id/text_message_time"
-        android:text="11:40"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
-        android:textColor="#ffffff"
-        app:layout_constraintLeft_toRightOf="@+id/text_message_body"
         android:layout_marginLeft="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/text_message_body" />
+        android:text="11:40"
+        android:textColor="#ffffff"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/text_message_body"
+        app:layout_constraintLeft_toRightOf="@+id/text_message_body" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintGuide_percent="0.25" />
 </androidx.constraintlayout.widget.ConstraintLayout>

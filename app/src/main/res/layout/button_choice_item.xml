@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/button_left_choice"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:background="@drawable/buttton_drawable"
+        android:padding="16dp"
+        android:text="You"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        app:layout_constraintWidth_percent="0.48"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_right_choice"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:background="@drawable/buttton_drawable"
+        android:padding="16dp"
+        android:text="You need"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        app:layout_constraintWidth_percent="0.48"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
