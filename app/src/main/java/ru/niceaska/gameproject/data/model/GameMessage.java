@@ -9,20 +9,31 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 @Entity(tableName = "message")
 public class GameMessage extends ListItem implements Parcelable {
 
-
+    @Expose
     @PrimaryKey(autoGenerate = true)
     private int id;
+
+    @SerializedName("message")
     @ColumnInfo(name = "message")
     private String message;
+
     @ColumnInfo(name = "time")
     private long time;
+
     @ColumnInfo(name = "is_gamer")
     private boolean isGamer;
+
     @ColumnInfo(name = "time_to_next")
+    @SerializedName("timeToNext")
     private int timeToNext;
+
+    @SerializedName("choices")
     @Embedded
     private Choices choices;
 

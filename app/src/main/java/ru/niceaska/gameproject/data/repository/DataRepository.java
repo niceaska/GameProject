@@ -39,4 +39,12 @@ public class DataRepository {
     public User getUser(String userId) {
         return database.getUserDao().getUserById(userId);
     }
+
+    private void updateUserInfo(String userId, int progress, List<HistoryMessage> historyMessageList) {
+        User user = getUser(userId);
+        user.savedMessages = historyMessageList;
+        user.userPojo.setProgress(progress);
+        insertUserInformation(user);
+    }
+
 }

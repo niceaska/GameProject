@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             this.listFragment = getSupportFragmentManager().getFragment(savedInstanceState, LIST_FRAGMENT);
             mainActivityPresenter.gameRun(true);
         } else {
+            listFragment = new MessageListFragment();
             mainActivityPresenter.gameRun(false);
             isFirstRun = false;
         }
@@ -48,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     @Override
     public void startGame() {
-        listFragment = new MessageListFragment();
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.list_fragment, listFragment)
