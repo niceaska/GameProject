@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject;
+package ru.niceaska.gameproject.presentation.view;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.niceaska.gameproject.R;
+import ru.niceaska.gameproject.data.model.Choices;
+import ru.niceaska.gameproject.data.model.GameMessage;
+import ru.niceaska.gameproject.data.model.ListItem;
+
 public class MessagesAdapter extends RecyclerView.Adapter {
 
     private List<ListItem> listObj = new ArrayList<>();
@@ -26,8 +31,8 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Object item = listObj.get(position);
-        if (item instanceof  Message) {
-            return ((Message) item).isGamer() ? GAMER_ID : MESSAGE_ID;
+        if (item instanceof GameMessage) {
+            return ((GameMessage) item).isGamer() ? GAMER_ID : MESSAGE_ID;
         } else if (item instanceof Choices) {
             return CHOICE_ID;
         } else {
@@ -58,7 +63,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof MessageViewHolder) {
-            ((MessageViewHolder) holder).onBind(((Message)listObj.get(position)).getMessage());
+            ((MessageViewHolder) holder).onBind(((GameMessage) listObj.get(position)).getMessage());
         } else if (holder instanceof  ButtonChoicesViewHolder) {
             ((ButtonChoicesViewHolder) holder).onBind((Choices) listObj.get(position));
         } else {

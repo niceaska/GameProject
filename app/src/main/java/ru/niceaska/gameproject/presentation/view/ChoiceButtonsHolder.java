@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject;
+package ru.niceaska.gameproject.presentation.view;
 
 public interface ChoiceButtonsHolder {
     void onPositiveChoice();

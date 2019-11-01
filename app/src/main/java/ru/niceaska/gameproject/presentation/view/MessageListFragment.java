@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject;
+package ru.niceaska.gameproject.presentation.view;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -13,42 +13,34 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import ru.niceaska.gameproject.MyApp;
+import ru.niceaska.gameproject.R;
+import ru.niceaska.gameproject.data.model.Choices;
+import ru.niceaska.gameproject.data.model.GameMessage;
+import ru.niceaska.gameproject.data.model.ListItem;
+import ru.niceaska.gameproject.data.repository.AppDatabase;
 
 public class MessageListFragment extends Fragment {
 
-    private static final String LIST_STATE_KEY = "list state";
+    private static final String LIST_STATE_KEY = "listState";
     private RecyclerView recyclerView;
     private Parcelable listState;
+    AppDatabase database;
     private LinearLayoutManager layoutManager;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
 
 
-    private List<ListItem> meaageTest = Arrays.asList(
-            new Message("Привет анон я только недавно сюда приехал и заметил странное. ",
-                    0,
-                    false
-            ),
-            new Message("Кажется по дороге кто-то идет",
-                    0,
-                    false
-            ),
-            new Message("Похоже это какая то старушка. Что делать?",
-                    0,
-                    false
-            ),
-            new Choices("Помочь", "Помоги ей перейти дорогу",
-                    "Нафиг бабушек", "Игнорировать",
-                    new Message("хорошо я помогу", 0, false),
-                    new Message("Да и хрен с ней", 0, false))
-    );
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.message_list_fragment, container, false);
+        database = MyApp.getInstance().getDatabase();
         initRecycler(v);
+
         return v;
     }
 
@@ -56,7 +48,15 @@ public class MessageListFragment extends Fragment {
         recyclerView = v.findViewById(R.id.dialog_view);
         layoutManager = new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        messagesAdapter.setListObj(new ArrayList<ListItem>(meaageTest));
+        List<GameMessage> messges = database.getGameMessgeDao().getAllMessges();
+        List<ListItem> messageList = new ArrayList<>();
+        for (GameMessage message : messges) {
+            messageList.add(message);
+            if (message.getChoices() != null) {
+                messageList.add(message.getChoices());
+            }
+        }
+        messagesAdapter.setListObj(messageList);
         messagesAdapter.setListener(new ChoiceButtonsHolder() {
             @Override
             public void onPositiveChoice() {
@@ -65,8 +65,12 @@ public class MessageListFragment extends Fragment {
                 if (!newList.isEmpty()) {
                     Object item = newList.get(newList.size() - 1);
                     if (item instanceof Choices) {
-                        newList.set(newList.size() - 1, new Message(((Choices) item).getPositiveChoice(), 0, true));
-                        newList.add(((Choices) item).getPositiveMessage());
+                        newList.set(newList.size() - 1,
+                                new GameMessage(((Choices) item).getPositiveChoice(), 0, true, null)
+                        );
+                        newList.add(
+                                new GameMessage(((Choices) item).getPositiveMessageAnswer(), 0, false, null)
+                        );
                     }
                     messagesAdapter.updateList(newList);
                 }
@@ -79,8 +83,12 @@ public class MessageListFragment extends Fragment {
                 if (!newList.isEmpty()) {
                     Object item = newList.get(newList.size() - 1);
                     if (item instanceof Choices) {
-                        newList.set(newList.size() - 1, new Message(((Choices) item).getNegativeChoice(), 0, true));
-                        newList.add(((Choices) item).getNegativeMessage());
+                        newList.set(newList.size() - 1,
+                                new GameMessage(((Choices) item).getNegativeChoice(), 0, true, null)
+                        );
+                        newList.add(
+                                new GameMessage(((Choices) item).getNegativeMessageAnswer(), 0, false, null)
+                        );
                     }
                     messagesAdapter.updateList(newList);
                 }

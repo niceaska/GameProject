@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject;
+package ru.niceaska.gameproject.presentation.view;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,8 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class GameStartFragment extends Fragment implements GameStartApp {
+import ru.niceaska.gameproject.R;
+import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.presentation.presenter.StartAppPresenter;
 
+public class GameStartFragment extends Fragment implements IGameStartFragment {
+    StartAppPresenter startAppPresenter;
+    DataRepository dataRepository;
 
     @Nullable
     @Override
@@ -19,10 +24,12 @@ public class GameStartFragment extends Fragment implements GameStartApp {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.start_game_layout, container, false);
         final Button startGame = v.findViewById(R.id.start_new_game);
+        dataRepository = new DataRepository();
+        startAppPresenter = new StartAppPresenter(this, dataRepository);
         startGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginNewGame();
+                startAppPresenter.loadData();
             }
         });
         return v;
@@ -30,8 +37,8 @@ public class GameStartFragment extends Fragment implements GameStartApp {
 
     @Override
     public void beginNewGame() {
-        if (getActivity() instanceof StartGameContract) {
-            ((StartGameContract) getActivity()).startGame();
+        if (getActivity() instanceof IMainActivity) {
+            ((IMainActivity) getActivity()).startGame();
         }
     }
 }

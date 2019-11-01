@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject;
+package ru.niceaska.gameproject.data.model;
 
 import android.os.Parcelable;
 

@@ -1,8 +1,12 @@
-package ru.niceaska.gameproject;
+package ru.niceaska.gameproject.presentation.view;
 
 import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
+
+import ru.niceaska.gameproject.data.model.Choices;
+import ru.niceaska.gameproject.data.model.GameMessage;
+import ru.niceaska.gameproject.data.model.ListItem;
 
 public class MessagesDiffCallback extends DiffUtil.Callback {
 
@@ -35,12 +39,12 @@ public class MessagesDiffCallback extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         Object oldItem = oldList.get(oldItemPosition);
         Object newItem = newList.get(newItemPosition);
-        if (oldItem instanceof Message && newItem instanceof Message) {
-            return ((Message) oldItem).isGamer() == ((Message) newItem).isGamer()
-                    && ((Message) oldItem).getMessage().equals(((Message) newItem).getMessage());
+        if (oldItem instanceof GameMessage && newItem instanceof GameMessage) {
+            return ((GameMessage) oldItem).isGamer() == ((GameMessage) newItem).isGamer()
+                    && ((GameMessage) oldItem).getMessage().equals(((GameMessage) newItem).getMessage());
         } else if (oldItem instanceof Choices && newItem instanceof Choices) {
-            return ((Choices) oldItem).getPositiveMessage().equals(((Choices) newItem).getPositiveMessage())
-                    && ((Choices) oldItem).getNegativeMessage().equals(((Choices) newItem).getNegativeMessage());
+            return ((Choices) oldItem).getPositiveMessageAnswer().equals(((Choices) newItem).getPositiveMessageAnswer())
+                    && ((Choices) oldItem).getNegativeMessageAnswer().equals(((Choices) newItem).getNegativeMessageAnswer());
         }
         return false;
     }
