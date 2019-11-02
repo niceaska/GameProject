@@ -4,8 +4,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
-import androidx.fragment.app.Fragment;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,9 +76,10 @@ public class ListFragmentPresenter {
             final ListFragmentPresenter listFragmentPresenter = this;
             final Random random = new Random();
             final int rand = random.nextInt(5) + 5;
-            Fragment fragment = messageListFragmentWeakReference.get();
+            MessageListFragment fragment = messageListFragmentWeakReference.get();
             if (fragment != null && fragment.isAdded()) {
-                ((MessageListFragment) fragment).showAnimation(rand);
+                fragment.showUserTyping();
+                fragment.showAnimation(rand);
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -268,6 +267,8 @@ public class ListFragmentPresenter {
                 MessageListFragment fragment = listFragmentPresenter.messageListFragmentWeakReference.get();
                 if (fragment != null) {
                     fragment.updateMessageList(listItems);
+                    fragment.hideUserTyping();
+                    fragment.clearAnimation();
                     listFragmentPresenter.setLastIndex(lastIndex + 1);
                     fragment.setGameProgress(lastIndex + 1);
                     listFragmentPresenter.checkGameState(listItems, gameStop);

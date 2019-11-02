@@ -123,7 +123,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         Button buttonRight;
         ChoiceButtonsHolder listener;
 
-        public ButtonChoicesViewHolder(@NonNull View itemView, ChoiceButtonsHolder listener) {
+        ButtonChoicesViewHolder(@NonNull View itemView, ChoiceButtonsHolder listener) {
             super(itemView);
             buttonLeft = itemView.findViewById(R.id.button_left_choice);
             buttonRight = itemView.findViewById(R.id.button_right_choice);

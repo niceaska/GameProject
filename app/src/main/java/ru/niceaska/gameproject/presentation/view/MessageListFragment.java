@@ -1,6 +1,5 @@
 package ru.niceaska.gameproject.presentation.view;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
@@ -39,6 +38,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     private LinearLayoutManager layoutManager;
     private TypeWriter typeWriter;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
+    private ObjectAnimator animator;
 
     public static MessageListFragment newInstance() {
 
@@ -95,41 +95,30 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         CharSequence startString = requireContext().getResources().getString(R.string.printing);
         StringBuilder stringBuilder = new StringBuilder();
         typeWriter.setAnimatedText(stringBuilder.append(startString).append("..."));
-        ObjectAnimator objectAnimator = ObjectAnimator.ofInt(typeWriter, "textVisibility",
+        animator = ObjectAnimator.ofInt(typeWriter, "textVisibility",
                 startString.length(), startString.length() + 3);
-        objectAnimator.setRepeatCount(repeatCount);
-        objectAnimator.setStartDelay(700);
-        objectAnimator.setDuration(ANIMATION_DURATION);
-        objectAnimator.addListener(new ValueAnimator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                typeWriter.setVisibility(View.VISIBLE);
-            }
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.setStartDelay(700);
+        animator.setDuration(ANIMATION_DURATION);
+        animator.start();
+    }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                typeWriter.setVisibility(View.GONE);
-            }
+    @Override
+    public void showUserTyping() {
+        typeWriter.setVisibility(View.VISIBLE);
+    }
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                typeWriter.setVisibility(View.GONE);
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        objectAnimator.start();
+    @Override
+    public void hideUserTyping() {
+        typeWriter.setVisibility(View.GONE);
 
     }
 
     @Override
-    public void showListData() {
-
+    public void clearAnimation() {
+        animator.end();
     }
+
 
     @Override
     public void initRecycler(List<ListItem> listItems) {
@@ -159,14 +148,11 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         messagesAdapter.updateList(newList);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        animator.end();
         listFragmentPresenter.cancelAllTasks();
         Log.d("hihu", "onDestroy: ");
         listFragmentPresenter.saveOnDestroy(messagesAdapter.getListObj());

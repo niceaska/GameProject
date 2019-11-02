@@ -5,13 +5,15 @@ import java.util.List;
 import ru.niceaska.gameproject.data.model.ListItem;
 
 public interface IMessageListFragment {
+
     void showAnimation(int repeatCount);
 
-    void showListData();
+    void showUserTyping();
 
+    void hideUserTyping();
+
+    void clearAnimation();
     void initRecyclerListeners();
-
     void initRecycler(List<ListItem> listItems);
-
     void updateMessageList(List<ListItem> newList);
 }
