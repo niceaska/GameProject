@@ -2,6 +2,9 @@ package ru.niceaska.gameproject.presentation.presenter;
 
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -20,6 +23,16 @@ import ru.niceaska.gameproject.presentation.view.MessageListFragment;
 public class ListFragmentPresenter {
 
 
+    public void cancelAllTasks() {
+        if (gameLoopAsyncTask != null && (gameLoopAsyncTask.getStatus() == AsyncTask.Status.PENDING
+                || gameLoopAsyncTask.getStatus() == AsyncTask.Status.RUNNING)) {
+            gameLoopAsyncTask.cancel(true);
+            Log.d("detach", "cancell ");
+        }
+        Log.d("detach", "onDetach: ");
+
+    }
+
     public enum Choice {
         NEGATIVE,
         POSITIVE
@@ -30,6 +43,7 @@ public class ListFragmentPresenter {
     private WeakReference<MessageListFragment> messageListFragmentWeakReference;
     private DataRepository dataRepository;
     private Handler handler;
+    private GameLoopAsyncTask gameLoopAsyncTask;
 
     public ListFragmentPresenter(MessageListFragment messageListFragmentWeakReference,
                                  DataRepository dataRepository) {
@@ -41,6 +55,7 @@ public class ListFragmentPresenter {
 
     public void onGameStart(int lastIndex, boolean isRestored, List<ListItem> listItems) {
         this.lastIndex = lastIndex;
+        Log.d("lasyInd", "onGameStart: " + lastIndex);
         if (!isRestored) {
             List<HistoryMessage> messages = dataRepository.getHistory("1");
             List<ListItem> messageList = new ArrayList<ListItem>(messages);
@@ -59,18 +74,21 @@ public class ListFragmentPresenter {
     }
 
     private void gameLoop() {
-        if (listItems != null && lastIndex <= 4) {
+        if (listItems != null && lastIndex < 4) {
             final ListFragmentPresenter listFragmentPresenter = this;
             final Random random = new Random();
             final int rand = random.nextInt(5) + 5;
-            messageListFragmentWeakReference.get().showAnimation(rand);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    GameLoopAsyncTask asyncTask = new GameLoopAsyncTask(getLastIndex(), listFragmentPresenter);
-                    asyncTask.execute(listItems);
-                }
-            }, rand * 5000);
+            Fragment fragment = messageListFragmentWeakReference.get();
+            if (fragment != null && fragment.isAdded()) {
+                ((MessageListFragment) fragment).showAnimation(rand);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        gameLoopAsyncTask = new GameLoopAsyncTask(getLastIndex(), listFragmentPresenter);
+                        gameLoopAsyncTask.execute(listItems);
+                    }
+                }, rand * 5000);
+            }
         }
     }
 
@@ -203,6 +221,7 @@ public class ListFragmentPresenter {
             listFragmentPresenterWeakReference.get()
                     .messageListFragmentWeakReference.get()
                     .setGameProgress(integer);
+            Log.d("lasyInd", "onGameStart: " + listFragmentPresenterWeakReference.get().getLastIndex());
             listFragmentPresenterWeakReference.get().gameLoop();
         }
     }
@@ -244,14 +263,16 @@ public class ListFragmentPresenter {
 
         @Override
         protected void onPostExecute(List<ListItem> listItems) {
-            listFragmentPresenterWeakReference.get()
-                    .messageListFragmentWeakReference.get()
-                    .updateMessageList(listItems);
-            listFragmentPresenterWeakReference.get().setLastIndex(lastIndex + 1);
-            listFragmentPresenterWeakReference.get()
-                    .messageListFragmentWeakReference.get()
-                    .setGameProgress(lastIndex + 1);
-            listFragmentPresenterWeakReference.get().checkGameState(listItems, gameStop);
+            ListFragmentPresenter listFragmentPresenter = listFragmentPresenterWeakReference.get();
+            if (listFragmentPresenter != null) {
+                MessageListFragment fragment = listFragmentPresenter.messageListFragmentWeakReference.get();
+                if (fragment != null) {
+                    fragment.updateMessageList(listItems);
+                    listFragmentPresenter.setLastIndex(lastIndex + 1);
+                    fragment.setGameProgress(lastIndex + 1);
+                    listFragmentPresenter.checkGameState(listItems, gameStop);
+                }
+            }
         }
     }
 }

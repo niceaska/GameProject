@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,6 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         Bundle args = new Bundle();
         MessageListFragment fragment = new MessageListFragment();
         fragment.setArguments(args);
-        fragment.setRetainInstance(true);
         return fragment;
     }
 
@@ -160,8 +160,15 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+        listFragmentPresenter.cancelAllTasks();
+        Log.d("hihu", "onDestroy: ");
         listFragmentPresenter.saveOnDestroy(messagesAdapter.getListObj());
     }
 
