@@ -27,6 +27,10 @@ public class DataRepository {
         database.getGameMessgeDao().insertMessge(messages);
     }
 
+    public int getUserProgress(String userId) {
+        return database.getUserDao().getuserProgress(userId);
+    }
+
     public GameMessage getMessageById(long id) {
         return database.getGameMessgeDao().getById(id);
     }
@@ -40,11 +44,13 @@ public class DataRepository {
         return database.getUserDao().getUserById(userId);
     }
 
-    private void updateUserInfo(String userId, int progress, List<HistoryMessage> historyMessageList) {
-        User user = getUser(userId);
-        user.savedMessages = historyMessageList;
-        user.userPojo.setProgress(progress);
+    public void updateUserInfo(User user) {
+        User userCheck = getUser(user.userPojo.getUserId());
+        if (userCheck.userPojo.getProgress() > user.userPojo.getProgress()) {
+            user.userPojo.setProgress(userCheck.userPojo.getProgress());
+        }
         insertUserInformation(user);
     }
+
 
 }

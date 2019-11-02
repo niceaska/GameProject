@@ -13,7 +13,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity(tableName = "message")
-public class GameMessage extends ListItem implements Parcelable {
+public class GameMessage extends MessageItem implements Parcelable {
 
     @Expose
     @PrimaryKey(autoGenerate = true)

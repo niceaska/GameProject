@@ -17,7 +17,7 @@ import androidx.room.Ignore;
                 childColumns = "user",
                 onDelete = ForeignKey.CASCADE),
         primaryKeys = {"id", "user"})
-public class HistoryMessage extends ListItem implements Parcelable {
+public class HistoryMessage extends MessageItem implements Parcelable {
     @NonNull
     @ColumnInfo(name = "id", index = true)
     private String id;
@@ -31,7 +31,7 @@ public class HistoryMessage extends ListItem implements Parcelable {
     @ColumnInfo(name = "is_gamer")
     private boolean isGamer;
     @Ignore
-    private long timeToNext;
+    private int timeToNext;
 
     public HistoryMessage(String id, String user, String message, long time, boolean isGamer) {
         this.id = id;
@@ -48,7 +48,7 @@ public class HistoryMessage extends ListItem implements Parcelable {
         message = in.readString();
         time = in.readLong();
         isGamer = in.readByte() != 0;
-        timeToNext = in.readLong();
+        timeToNext = in.readInt();
     }
 
     public static final Creator<HistoryMessage> CREATOR = new Creator<HistoryMessage>() {
@@ -75,7 +75,7 @@ public class HistoryMessage extends ListItem implements Parcelable {
         dest.writeString(message);
         dest.writeLong(time);
         dest.writeByte((byte) (isGamer ? 1 : 0));
-        dest.writeLong(timeToNext);
+        dest.writeInt(timeToNext);
     }
 
     public String getId() {
@@ -118,11 +118,11 @@ public class HistoryMessage extends ListItem implements Parcelable {
         isGamer = gamer;
     }
 
-    public long getTimeToNext() {
+    public int getTimeToNext() {
         return timeToNext;
     }
 
-    public void setTimeToNext(long timeToNext) {
+    public void setTimeToNext(int timeToNext) {
         this.timeToNext = timeToNext;
     }
 }

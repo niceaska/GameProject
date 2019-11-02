@@ -13,7 +13,6 @@ import java.io.Reader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ru.niceaska.gameproject.data.model.GameMessage;
@@ -51,9 +50,7 @@ public class StartAppPresenter {
     }
 
     public void loadData() {
-        User user = new User(new UserPojo("1", "test", 0), new ArrayList<HistoryMessage>(
-                Arrays.asList(new HistoryMessage("0", "1", "test", 0, true))
-        ));
+        User user = new User(new UserPojo("1", "test", 0), new ArrayList<HistoryMessage>());
         new FirstLoadData(gameStartFragmentWeakReference, dataRepository).execute(user);
     }
 

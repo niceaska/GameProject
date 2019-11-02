@@ -16,6 +16,9 @@ public abstract class UserDao {
     @Query("SELECT * FROM UserPojo WHERE userId = :userId")
     public abstract User getUserById(String userId);
 
+    @Query("SELECT progress FROM UserPojo WHERE userId = :userId")
+    public abstract int getuserProgress(String userId);
+
     @Transaction
     public void insert(User user) {
         insert(user.userPojo);

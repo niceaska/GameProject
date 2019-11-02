@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     private boolean isFirstRun;
     private MainActivityPresenter mainActivityPresenter;
-    private DataRepository dataRepository;
+    DataRepository dataRepository;
     private Fragment listFragment;
 
     @Override
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
             this.listFragment = getSupportFragmentManager().getFragment(savedInstanceState, LIST_FRAGMENT);
             mainActivityPresenter.gameRun(true);
         } else {
-            listFragment = new MessageListFragment();
+            listFragment = MessageListFragment.newInstance();
             mainActivityPresenter.gameRun(false);
             isFirstRun = false;
         }
