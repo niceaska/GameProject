@@ -10,13 +10,13 @@ import ru.niceaska.gameproject.data.model.ListItem;
 
 class GameLoopAsyncTask extends AsyncTask<List<ListItem>, Void, List<ListItem>> {
 
-    private int lastIndex;
+    private int nextIndex;
     private DataRepository dataRepository;
     private IOnMessageLoadListener listener;
 
-    GameLoopAsyncTask(int lastIndex, IOnMessageLoadListener listener) {
+    GameLoopAsyncTask(int nextIndex, IOnMessageLoadListener listener) {
         this.dataRepository = DataRepository.getInstance();
-        this.lastIndex = lastIndex;
+        this.nextIndex = nextIndex;
         this.listener = listener;
     }
 
@@ -24,7 +24,7 @@ class GameLoopAsyncTask extends AsyncTask<List<ListItem>, Void, List<ListItem>> 
     @Override
     protected List<ListItem> doInBackground(List<ListItem>... lists) {
         List<ListItem> listItems = new ArrayList<>(lists[0]);
-        GameMessage gameMessage = dataRepository.getMessageById(lastIndex + 1);
+        GameMessage gameMessage = dataRepository.getMessageById(nextIndex);
         if (gameMessage != null) {
             listItems.add(gameMessage);
             if (gameMessage.getChoices() != null) {

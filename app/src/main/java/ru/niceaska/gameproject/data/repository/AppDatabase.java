@@ -7,9 +7,9 @@ import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.UserPojo;
 
-@Database(entities = {GameMessage.class, UserPojo.class, HistoryMessage.class}, version = 7, exportSchema = false)
+@Database(entities = {GameMessage.class, UserPojo.class, HistoryMessage.class}, version = 9, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract GameMessgesDao getGameMessgeDao();
 
+    public abstract GameMessgesDao getGameMessgeDao();
     public abstract UserDao getUserDao();
 }

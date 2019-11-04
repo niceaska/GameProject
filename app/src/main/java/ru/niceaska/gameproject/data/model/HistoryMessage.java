@@ -1,14 +1,11 @@
 package ru.niceaska.gameproject.data.model;
 
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Ignore;
 
 
 @Entity(tableName = "history",
@@ -17,7 +14,7 @@ import androidx.room.Ignore;
                 childColumns = "user",
                 onDelete = ForeignKey.CASCADE),
         primaryKeys = {"id", "user"})
-public class HistoryMessage extends MessageItem implements Parcelable {
+public class HistoryMessage extends MessageItem {
     @NonNull
     @ColumnInfo(name = "id", index = true)
     private String id;
@@ -26,56 +23,22 @@ public class HistoryMessage extends MessageItem implements Parcelable {
     private String user;
     @ColumnInfo(name = "message")
     private String message;
-    @ColumnInfo(name = "time")
-    private long time;
     @ColumnInfo(name = "is_gamer")
     private boolean isGamer;
-    @Ignore
-    private int timeToNext;
+    @ColumnInfo(name = "next_message")
+    private int nextMessage;
+    @Embedded
+    private Choices choices;
 
-    public HistoryMessage(String id, String user, String message, long time, boolean isGamer) {
+
+    public HistoryMessage(@NonNull String id, @NonNull String user, String message,
+                          boolean isGamer, int nextMessage, Choices choices) {
         this.id = id;
         this.user = user;
         this.message = message;
-        this.time = time;
         this.isGamer = isGamer;
-        this.timeToNext = 0;
-    }
-
-    protected HistoryMessage(Parcel in) {
-        id = in.readString();
-        user = in.readString();
-        message = in.readString();
-        time = in.readLong();
-        isGamer = in.readByte() != 0;
-        timeToNext = in.readInt();
-    }
-
-    public static final Creator<HistoryMessage> CREATOR = new Creator<HistoryMessage>() {
-        @Override
-        public HistoryMessage createFromParcel(Parcel in) {
-            return new HistoryMessage(in);
-        }
-
-        @Override
-        public HistoryMessage[] newArray(int size) {
-            return new HistoryMessage[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(user);
-        dest.writeString(message);
-        dest.writeLong(time);
-        dest.writeByte((byte) (isGamer ? 1 : 0));
-        dest.writeInt(timeToNext);
+        this.nextMessage = nextMessage;
+        this.choices = choices;
     }
 
     public String getId() {
@@ -102,13 +65,6 @@ public class HistoryMessage extends MessageItem implements Parcelable {
         this.message = message;
     }
 
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
 
     public boolean isGamer() {
         return isGamer;
@@ -118,11 +74,19 @@ public class HistoryMessage extends MessageItem implements Parcelable {
         isGamer = gamer;
     }
 
-    public int getTimeToNext() {
-        return timeToNext;
+    public Choices getChoices() {
+        return choices;
     }
 
-    public void setTimeToNext(int timeToNext) {
-        this.timeToNext = timeToNext;
+    public int getNextMessage() {
+        return nextMessage;
+    }
+
+    public void setNextMessage(int nextMessage) {
+        this.nextMessage = nextMessage;
+    }
+
+    public void setChoices(Choices choices) {
+        this.choices = choices;
     }
 }

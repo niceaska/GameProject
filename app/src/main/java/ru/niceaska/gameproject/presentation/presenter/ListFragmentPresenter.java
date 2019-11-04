@@ -11,6 +11,7 @@ import ru.niceaska.gameproject.data.model.Choices;
 import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.ListItem;
+import ru.niceaska.gameproject.data.model.MessageItem;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
 import ru.niceaska.gameproject.data.repository.DataRepository;
@@ -47,28 +48,45 @@ public class ListFragmentPresenter {
             @Override
             public void onLoadData(int progress) {
                 setLastIndex(progress);
-                gameLoop();
+                getNextIndex();
+                gameLoop(getNextIndex());
             }
         };
         final IOnHistoryUpdatedListener historyUpdatedListener = new IOnHistoryUpdatedListener() {
             @Override
             public void onHistoryLoad(List<HistoryMessage> historyMessages) {
                 List<ListItem> messageList = new ArrayList<ListItem>(historyMessages);
+                if (!historyMessages.isEmpty()) {
+                    ListItem lastItem = messageList.get(messageList.size() - 1);
+                    if (((HistoryMessage) lastItem).getChoices() != null) {
+                        messageList.add(((HistoryMessage) lastItem).getChoices());
+                    }
+                }
+                listItems = messageList;
                 MessageListFragment fragment = messageListFragmentWeakReference.get();
                 if (fragment != null) {
                     fragment.updateMessageList(messageList);
                     fragment.scrollToBottom();
                 }
-                listItems = messageList;
-                dataRepository.loadUserProgress(progressLoadListener);
+                if (historyMessages.isEmpty() || !(listItems.get(listItems.size() - 1) instanceof Choices)) {
+                    dataRepository.loadUserProgress(progressLoadListener);
+                }
             }
         };
         dataRepository.loadHistory("1", historyUpdatedListener);
 
     }
 
-    private void gameLoop() {
-        if (listItems != null && lastIndex < 4) {
+    private int getNextIndex() {
+        int nextIndex = 1;
+        if (!listItems.isEmpty() && listItems.get(listItems.size() - 1) instanceof MessageItem) {
+            nextIndex = ((MessageItem) listItems.get(listItems.size() - 1)).getNextMessage();
+        }
+        return nextIndex;
+    }
+
+    private void gameLoop(final int nextIndex) {
+        if (listItems != null && nextIndex < 9) {
             final ListFragmentPresenter listFragmentPresenter = this;
             Runnable task = new Runnable() {
                 @Override
@@ -82,7 +100,7 @@ public class ListFragmentPresenter {
                                 fragment.scrollToBottom();
                                 fragment.hideUserTyping();
                                 fragment.clearAnimation();
-                                listFragmentPresenter.setLastIndex(lastIndex + 1);
+                                listFragmentPresenter.setLastIndex(nextIndex);
                                 if (!listItems.isEmpty()) {
                                     ListItem item = listItems.get(listItems.size() - 1);
                                     listFragmentPresenter.checkGameState(listItems, item instanceof Choices);
@@ -90,7 +108,7 @@ public class ListFragmentPresenter {
                             }
                         }
                     };
-                    dataRepository.loadNewGameMessage(lastIndex, listener, listItems);
+                    dataRepository.loadNewGameMessage(nextIndex, listener, listItems);
                 }
             };
             runDelayedMessage(task);
@@ -104,7 +122,7 @@ public class ListFragmentPresenter {
         if (fragment != null && fragment.isAdded()) {
             fragment.showUserTyping();
             fragment.showAnimation(rand);
-            handler.postDelayed(task, rand * 2500);
+            handler.postDelayed(task, rand * 1000);
         }
     }
 
@@ -121,13 +139,8 @@ public class ListFragmentPresenter {
                 GameMessage message = (GameMessage) listItem;
                 historyMessagesList.add(
                         new HistoryMessage(String.valueOf(i), "1",
-                                message.getMessage(), message.getTime(), message.isGamer()));
+                                message.getMessage(), message.isGamer(), message.getNextMessage(), message.getChoices()));
             }
-        }
-        ListItem lastItem = listItems.get(listItems.size() - 1);
-        if (lastItem instanceof Choices) {
-            historyMessagesList.remove(historyMessagesList.size() - 1);
-            lastIndex--;
         }
         UserPojo userPojo = new UserPojo("1", "test", lastIndex);
         User user = new User(userPojo, historyMessagesList);
@@ -151,7 +164,7 @@ public class ListFragmentPresenter {
     private void checkGameState(List<ListItem> itemlist, boolean isGameStopped) {
         this.listItems = itemlist;
         if (!isGameStopped) {
-            gameLoop();
+            gameLoop(getNextIndex());
         }
     }
 
@@ -162,23 +175,11 @@ public class ListFragmentPresenter {
             if (item instanceof Choices) {
                 newList.set(newList.size() - 1,
                         new HistoryMessage(String.valueOf(newList.size() - 1), "1",
-                                ((Choices) item).getPositiveChoice(), 0, true)
+                                ((Choices) item).getPositiveChoice(), true,
+                                ((Choices) item).getNegativeMessageAnswer(), null)
                 );
                 messageListFragmentWeakReference.get().updateMessageList(newList);
-                runDelayedMessage(new Runnable() {
-                    @Override
-                    public void run() {
-                        newList.add(
-                                new HistoryMessage(String.valueOf(newList.size()), "1",
-                                        ((Choices) item).getPositiveMessageAnswer(), 0, false)
-                        );
-                        messageListFragmentWeakReference.get().updateMessageList(newList);
-                        messageListFragmentWeakReference.get().hideUserTyping();
-                        messageListFragmentWeakReference.get().clearAnimation();
-                        messageListFragmentWeakReference.get().scrollToBottom();
-                        gameLoop();
-                    }
-                });
+                gameLoop(((Choices) item).getPositiveMessageAnswer());
                 this.listItems = newList;
             }
         }
@@ -191,23 +192,11 @@ public class ListFragmentPresenter {
             if (item instanceof Choices) {
                 newList.set(newList.size() - 1,
                         new HistoryMessage(String.valueOf(newList.size() - 1), "1",
-                                ((Choices) item).getNegativeChoice(), 0, true)
+                                ((Choices) item).getNegativeChoice(), true,
+                                ((Choices) item).getNegativeMessageAnswer(), null)
                 );
                 messageListFragmentWeakReference.get().updateMessageList(newList);
-                runDelayedMessage(new Runnable() {
-                    @Override
-                    public void run() {
-                        newList.add(
-                                new HistoryMessage(String.valueOf(newList.size()), "1",
-                                        ((Choices) item).getNegativeMessageAnswer(), 0, false)
-                        );
-                        messageListFragmentWeakReference.get().updateMessageList(newList);
-                        messageListFragmentWeakReference.get().hideUserTyping();
-                        messageListFragmentWeakReference.get().clearAnimation();
-                        messageListFragmentWeakReference.get().scrollToBottom();
-                        gameLoop();
-                    }
-                });
+                gameLoop(((Choices) item).getNegativeMessageAnswer());
                 this.listItems = newList;
             }
         }

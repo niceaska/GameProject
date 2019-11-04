@@ -51,8 +51,8 @@ public class MessagesDiffCallback extends DiffUtil.Callback {
             return ((MessageItem) oldItem).isGamer() == ((MessageItem) newItem).isGamer()
                     && ((MessageItem) oldItem).getMessage().equals(((MessageItem) newItem).getMessage());
         } else if (oldItem instanceof Choices && newItem instanceof Choices) {
-            return ((Choices) oldItem).getPositiveMessageAnswer().equals(((Choices) newItem).getPositiveMessageAnswer())
-                    && ((Choices) oldItem).getNegativeMessageAnswer().equals(((Choices) newItem).getNegativeMessageAnswer());
+            return ((Choices) oldItem).getPositiveMessageAnswer() == ((Choices) newItem).getPositiveMessageAnswer()
+                    && ((Choices) oldItem).getNegativeMessageAnswer() == (((Choices) newItem).getNegativeMessageAnswer());
         }
         return false;
     }
