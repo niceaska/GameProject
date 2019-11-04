@@ -14,6 +14,7 @@ import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
 import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.data.repository.IOnHistoryUpdatedListener;
 import ru.niceaska.gameproject.data.repository.IOnMessageLoadListener;
 import ru.niceaska.gameproject.data.repository.IOnUserProgressLoadListener;
 import ru.niceaska.gameproject.presentation.view.MessageListFragment;
@@ -40,31 +41,30 @@ public class ListFragmentPresenter {
     }
 
 
-    public void onGameStart(int lastIndex, boolean isRestored, List<ListItem> listItems) {
-        this.lastIndex = lastIndex;
-        if (!isRestored) {
-            List<HistoryMessage> messages = dataRepository.getHistory("1");
-            List<ListItem> messageList = new ArrayList<ListItem>(messages);
-            messageListFragmentWeakReference.get().initRecycler(messageList);
-            messageListFragmentWeakReference.get().initRecyclerListeners();
-            this.listItems = messageList;
-            IOnUserProgressLoadListener listener = new IOnUserProgressLoadListener() {
-                @Override
-                public void onLoadData(int progress) {
-                    setLastIndex(progress);
-                    messageListFragmentWeakReference.get().setGameProgress(progress);
-                    gameLoop();
-                }
-            };
-            dataRepository.loadUserProgress(listener);
-        } else {
-            messageListFragmentWeakReference.get().initRecycler(listItems);
-            messageListFragmentWeakReference.get().initRecyclerListeners();
-            this.listItems = listItems;
-            if (listItems.isEmpty() || !(listItems.get(listItems.size() - 1) instanceof Choices)) {
+    public void onGameStart() {
+
+        final IOnUserProgressLoadListener progressLoadListener = new IOnUserProgressLoadListener() {
+            @Override
+            public void onLoadData(int progress) {
+                setLastIndex(progress);
                 gameLoop();
             }
-        }
+        };
+        final IOnHistoryUpdatedListener historyUpdatedListener = new IOnHistoryUpdatedListener() {
+            @Override
+            public void onHistoryLoad(List<HistoryMessage> historyMessages) {
+                List<ListItem> messageList = new ArrayList<ListItem>(historyMessages);
+                MessageListFragment fragment = messageListFragmentWeakReference.get();
+                if (fragment != null) {
+                    fragment.updateMessageList(messageList);
+                    fragment.scrollToBottom();
+                }
+                listItems = messageList;
+                dataRepository.loadUserProgress(progressLoadListener);
+            }
+        };
+        dataRepository.loadHistory("1", historyUpdatedListener);
+
     }
 
     private void gameLoop() {
@@ -83,7 +83,6 @@ public class ListFragmentPresenter {
                                 fragment.hideUserTyping();
                                 fragment.clearAnimation();
                                 listFragmentPresenter.setLastIndex(lastIndex + 1);
-                                fragment.setGameProgress(lastIndex + 1);
                                 if (!listItems.isEmpty()) {
                                     ListItem item = listItems.get(listItems.size() - 1);
                                     listFragmentPresenter.checkGameState(listItems, item instanceof Choices);
@@ -215,13 +214,12 @@ public class ListFragmentPresenter {
     }
 
 
-    public void setLastIndex(int lastIndex) {
+    private void setLastIndex(int lastIndex) {
         this.lastIndex = lastIndex;
     }
 
-    public int getLastIndex() {
-        return lastIndex;
+    public void detachView() {
+        messageListFragmentWeakReference.clear();
     }
-
 
 }

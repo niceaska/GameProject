@@ -11,13 +11,11 @@ import ru.niceaska.gameproject.presentation.presenter.MainActivityPresenter;
 
 public class MainActivity extends AppCompatActivity implements IMainActivity {
 
-    static final String LIST_FRAGMENT = "listFragment";
     static final String FIRST_RUN = "firstRun";
 
     private boolean isFirstRun;
     private MainActivityPresenter mainActivityPresenter;
     private DataRepository dataRepository;
-    private Fragment listFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +26,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         dataRepository = DataRepository.getInstance();
         mainActivityPresenter = new MainActivityPresenter(this, dataRepository);
         if (savedInstanceState != null && !isFirstRun) {
-            this.listFragment = getSupportFragmentManager().getFragment(savedInstanceState, LIST_FRAGMENT);
             mainActivityPresenter.gameRun(true);
         } else {
-            listFragment = MessageListFragment.newInstance();
             mainActivityPresenter.gameRun(false);
             isFirstRun = false;
         }
@@ -42,16 +38,13 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putByte(FIRST_RUN, (byte) (isFirstRun ? 1 : 0));
-        if (this.listFragment != null && listFragment.isAdded()) {
-            getSupportFragmentManager().putFragment(outState, LIST_FRAGMENT, listFragment);
-        }
     }
 
     @Override
     public void startGame() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.list_fragment, listFragment)
+                .replace(R.id.list_fragment, MessageListFragment.newInstance())
                 .commit();
     }
 
@@ -62,4 +55,14 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 .replace(R.id.list_fragment, new GameStartFragment())
                 .commit();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_fragment);
+        if (fragment instanceof MessageListFragment) {
+            ((MessageListFragment) fragment).onFinalDestroy();
+        }
+    }
+
 }

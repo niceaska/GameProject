@@ -3,7 +3,6 @@ package ru.niceaska.gameproject.presentation.view;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.niceaska.gameproject.R;
@@ -27,15 +25,13 @@ import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresent
 
 public class MessageListFragment extends Fragment implements IMessageListFragment {
 
-    private static final String LIST_STATE_KEY = "listState";
-    private static final String PROGRESS_STATE_KEY = "progressState";
     private final int ANIMATION_DURATION = 5500;
     private RecyclerView recyclerView;
     private int gameProgress;
-    private Parcelable listState;
     private ListFragmentPresenter listFragmentPresenter;
     private LinearLayoutManager layoutManager;
     private TypeWriter typeWriter;
+    private boolean isSaveState;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
     private ObjectAnimator animator;
 
@@ -44,48 +40,29 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         Bundle args = new Bundle();
         MessageListFragment fragment = new MessageListFragment();
         fragment.setArguments(args);
+        fragment.setRetainInstance(true);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        listFragmentPresenter = new ListFragmentPresenter(this, DataRepository.getInstance());
+        listFragmentPresenter.onGameStart();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.message_list_fragment, container, false);
-        listFragmentPresenter = new ListFragmentPresenter(this, DataRepository.getInstance());
         recyclerView = v.findViewById(R.id.dialog_view);
         layoutManager = new LinearLayoutManager(
                 requireContext(), RecyclerView.VERTICAL, false
         );
         typeWriter = v.findViewById(R.id.textView);
         recyclerView.setLayoutManager(layoutManager);
-
+        initRecyclerListeners();
         return v;
-    }
-
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle state) {
-        super.onSaveInstanceState(state);
-        listState = layoutManager.onSaveInstanceState();
-        state.putParcelableArrayList("key", (ArrayList<? extends Parcelable>) messagesAdapter.getListObj());
-        state.putParcelable(LIST_STATE_KEY, listState);
-        state.putInt(PROGRESS_STATE_KEY, gameProgress);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            listState = savedInstanceState.getParcelable(LIST_STATE_KEY);
-            gameProgress = savedInstanceState.getInt(PROGRESS_STATE_KEY);
-            if (listState != null) {
-                layoutManager.onRestoreInstanceState(listState);
-            }
-            listFragmentPresenter.onGameStart(gameProgress, true,
-                    savedInstanceState.<ListItem>getParcelableArrayList("key"));
-        } else {
-            listFragmentPresenter.onGameStart(gameProgress, false, new ArrayList<ListItem>());
-        }
     }
 
 
@@ -97,7 +74,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         animator = ObjectAnimator.ofInt(typeWriter, "textVisibility",
                 startString.length(), startString.length() + 3);
         animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setStartDelay(700);
+        animator.setStartDelay(200);
         animator.setDuration(ANIMATION_DURATION);
         animator.start();
     }
@@ -124,13 +101,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     }
 
 
-    @Override
-    public void initRecycler(List<ListItem> listItems) {
-        messagesAdapter.setListObj(listItems);
-    }
-
-    @Override
-    public void initRecyclerListeners() {
+    private void initRecyclerListeners() {
         messagesAdapter.setListener(new ChoiceButtonsHolder() {
             @Override
             public void onPositiveChoice() {
@@ -152,6 +123,11 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         messagesAdapter.updateList(newList);
     }
 
+    @Override
+    public void onFinalDestroy() {
+        listFragmentPresenter.saveOnDestroy(messagesAdapter.getListObj());
+    }
+
 
     @Override
     public void onStop() {
@@ -159,10 +135,11 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         if (animator != null) {
             animator.end();
         }
-        listFragmentPresenter.saveOnDestroy(messagesAdapter.getListObj());
     }
 
-    public void setGameProgress(int gameProgress) {
-        this.gameProgress = gameProgress;
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listFragmentPresenter.detachView();
     }
 }

@@ -18,14 +18,14 @@ import java.util.List;
 import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.User;
 
-class FirstLoadData extends AsyncTask<User, Void, Void> {
+class FirstLoadDataAsyncTask extends AsyncTask<User, Void, Void> {
     private static final String FILE_NAME = "scenario.json";
     private WeakReference<Activity> activityWeakReference;
     private IOnFirstLoadDataListener listener;
     private DataRepository dataRepository;
 
-    FirstLoadData(Activity activiy,
-                  IOnFirstLoadDataListener listener) {
+    FirstLoadDataAsyncTask(Activity activiy,
+                           IOnFirstLoadDataListener listener) {
         this.activityWeakReference = new WeakReference<>(activiy);
         this.listener = listener;
         this.dataRepository = DataRepository.getInstance();

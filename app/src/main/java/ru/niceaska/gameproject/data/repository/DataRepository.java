@@ -82,7 +82,11 @@ public class DataRepository {
     }
 
     public void firstLoadData(User user, IOnFirstLoadDataListener listener, Activity activity) {
-        new FirstLoadData(activity, listener).execute(user);
+        new FirstLoadDataAsyncTask(activity, listener).execute(user);
+    }
+
+    public void loadHistory(String userId, IOnHistoryUpdatedListener historyUpdatedListener) {
+        new LoadHistoryAsyncTask(historyUpdatedListener).execute(userId);
     }
 
     static class SaveGameDataOnStopTask extends AsyncTask<User, Void, Void> {
