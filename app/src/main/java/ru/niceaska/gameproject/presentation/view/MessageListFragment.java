@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +51,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.message_list_fragment, container, false);
-        listFragmentPresenter = new ListFragmentPresenter(this, new DataRepository());
+        listFragmentPresenter = new ListFragmentPresenter(this, DataRepository.getInstance());
         recyclerView = v.findViewById(R.id.dialog_view);
         layoutManager = new LinearLayoutManager(
                 requireContext(), RecyclerView.VERTICAL, false
@@ -119,6 +118,11 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         animator.end();
     }
 
+    @Override
+    public void scrollToBottom() {
+        layoutManager.scrollToPosition(messagesAdapter.getItemCount() - 1);
+    }
+
 
     @Override
     public void initRecycler(List<ListItem> listItems) {
@@ -150,11 +154,11 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
 
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        animator.end();
-        listFragmentPresenter.cancelAllTasks();
-        Log.d("hihu", "onDestroy: ");
+    public void onStop() {
+        super.onStop();
+        if (animator != null) {
+            animator.end();
+        }
         listFragmentPresenter.saveOnDestroy(messagesAdapter.getListObj());
     }
 

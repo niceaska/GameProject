@@ -24,7 +24,7 @@ public class GameStartFragment extends Fragment implements IGameStartFragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.start_game_layout, container, false);
         final Button startGame = v.findViewById(R.id.start_new_game);
-        dataRepository = new DataRepository();
+        dataRepository = DataRepository.getInstance();
         startAppPresenter = new StartAppPresenter(this, dataRepository);
         startGame.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,8 +1,6 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -16,20 +14,12 @@ import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
 import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.data.repository.IOnMessageLoadListener;
+import ru.niceaska.gameproject.data.repository.IOnUserProgressLoadListener;
 import ru.niceaska.gameproject.presentation.view.MessageListFragment;
 
 public class ListFragmentPresenter {
 
-
-    public void cancelAllTasks() {
-        if (gameLoopAsyncTask != null && (gameLoopAsyncTask.getStatus() == AsyncTask.Status.PENDING
-                || gameLoopAsyncTask.getStatus() == AsyncTask.Status.RUNNING)) {
-            gameLoopAsyncTask.cancel(true);
-            Log.d("detach", "cancell ");
-        }
-        Log.d("detach", "onDetach: ");
-
-    }
 
     public enum Choice {
         NEGATIVE,
@@ -41,7 +31,6 @@ public class ListFragmentPresenter {
     private WeakReference<MessageListFragment> messageListFragmentWeakReference;
     private DataRepository dataRepository;
     private Handler handler;
-    private GameLoopAsyncTask gameLoopAsyncTask;
 
     public ListFragmentPresenter(MessageListFragment messageListFragmentWeakReference,
                                  DataRepository dataRepository) {
@@ -53,19 +42,26 @@ public class ListFragmentPresenter {
 
     public void onGameStart(int lastIndex, boolean isRestored, List<ListItem> listItems) {
         this.lastIndex = lastIndex;
-        Log.d("lasyInd", "onGameStart: " + lastIndex);
         if (!isRestored) {
             List<HistoryMessage> messages = dataRepository.getHistory("1");
             List<ListItem> messageList = new ArrayList<ListItem>(messages);
             messageListFragmentWeakReference.get().initRecycler(messageList);
             messageListFragmentWeakReference.get().initRecyclerListeners();
             this.listItems = messageList;
-            new UserProgressAsyncTask(this).execute();
+            IOnUserProgressLoadListener listener = new IOnUserProgressLoadListener() {
+                @Override
+                public void onLoadData(int progress) {
+                    setLastIndex(progress);
+                    messageListFragmentWeakReference.get().setGameProgress(progress);
+                    gameLoop();
+                }
+            };
+            dataRepository.loadUserProgress(listener);
         } else {
             messageListFragmentWeakReference.get().initRecycler(listItems);
             messageListFragmentWeakReference.get().initRecyclerListeners();
             this.listItems = listItems;
-            if (!(listItems.get(listItems.size() - 1) instanceof Choices)) {
+            if (listItems.isEmpty() || !(listItems.get(listItems.size() - 1) instanceof Choices)) {
                 gameLoop();
             }
         }
@@ -74,20 +70,42 @@ public class ListFragmentPresenter {
     private void gameLoop() {
         if (listItems != null && lastIndex < 4) {
             final ListFragmentPresenter listFragmentPresenter = this;
-            final Random random = new Random();
-            final int rand = random.nextInt(5) + 5;
-            MessageListFragment fragment = messageListFragmentWeakReference.get();
-            if (fragment != null && fragment.isAdded()) {
-                fragment.showUserTyping();
-                fragment.showAnimation(rand);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        gameLoopAsyncTask = new GameLoopAsyncTask(getLastIndex(), listFragmentPresenter);
-                        gameLoopAsyncTask.execute(listItems);
-                    }
-                }, rand * 5000);
-            }
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    IOnMessageLoadListener listener = new IOnMessageLoadListener() {
+                        @Override
+                        public void onDataLoaded(List<ListItem> listItems) {
+                            MessageListFragment fragment = listFragmentPresenter.messageListFragmentWeakReference.get();
+                            if (fragment != null) {
+                                fragment.updateMessageList(listItems);
+                                fragment.scrollToBottom();
+                                fragment.hideUserTyping();
+                                fragment.clearAnimation();
+                                listFragmentPresenter.setLastIndex(lastIndex + 1);
+                                fragment.setGameProgress(lastIndex + 1);
+                                if (!listItems.isEmpty()) {
+                                    ListItem item = listItems.get(listItems.size() - 1);
+                                    listFragmentPresenter.checkGameState(listItems, item instanceof Choices);
+                                }
+                            }
+                        }
+                    };
+                    dataRepository.loadNewGameMessage(lastIndex, listener, listItems);
+                }
+            };
+            runDelayedMessage(task);
+        }
+    }
+
+    private void runDelayedMessage(Runnable task) {
+        final Random random = new Random();
+        final int rand = random.nextInt(5) + 5;
+        MessageListFragment fragment = messageListFragmentWeakReference.get();
+        if (fragment != null && fragment.isAdded()) {
+            fragment.showUserTyping();
+            fragment.showAnimation(rand);
+            handler.postDelayed(task, rand * 2500);
         }
     }
 
@@ -114,7 +132,7 @@ public class ListFragmentPresenter {
         }
         UserPojo userPojo = new UserPojo("1", "test", lastIndex);
         User user = new User(userPojo, historyMessagesList);
-        new SaveGameDataOnDestroyTask().execute(user);
+        dataRepository.saveUserData(user);
     }
 
 
@@ -139,44 +157,59 @@ public class ListFragmentPresenter {
     }
 
     private void positiveChoiceCallback(List<ListItem> listItems) {
-        List<ListItem> newList = new ArrayList<ListItem>(listItems);
+        final List<ListItem> newList = new ArrayList<ListItem>(listItems);
         if (!newList.isEmpty()) {
-            Object item = newList.get(newList.size() - 1);
+            final Object item = newList.get(newList.size() - 1);
             if (item instanceof Choices) {
                 newList.set(newList.size() - 1,
                         new HistoryMessage(String.valueOf(newList.size() - 1), "1",
                                 ((Choices) item).getPositiveChoice(), 0, true)
                 );
                 messageListFragmentWeakReference.get().updateMessageList(newList);
-                newList.add(
-                        new HistoryMessage(String.valueOf(newList.size()), "1",
-                                ((Choices) item).getPositiveMessageAnswer(), 0, false)
-                );
-
-                messageListFragmentWeakReference.get().updateMessageList(newList);
+                runDelayedMessage(new Runnable() {
+                    @Override
+                    public void run() {
+                        newList.add(
+                                new HistoryMessage(String.valueOf(newList.size()), "1",
+                                        ((Choices) item).getPositiveMessageAnswer(), 0, false)
+                        );
+                        messageListFragmentWeakReference.get().updateMessageList(newList);
+                        messageListFragmentWeakReference.get().hideUserTyping();
+                        messageListFragmentWeakReference.get().clearAnimation();
+                        messageListFragmentWeakReference.get().scrollToBottom();
+                        gameLoop();
+                    }
+                });
                 this.listItems = newList;
-                gameLoop();
             }
         }
     }
 
     private void negativeChoiceCallback(List<ListItem> listItems) {
-        List<ListItem> newList = new ArrayList<ListItem>(listItems);
+        final List<ListItem> newList = new ArrayList<ListItem>(listItems);
         if (!newList.isEmpty()) {
-            Object item = newList.get(newList.size() - 1);
+            final Object item = newList.get(newList.size() - 1);
             if (item instanceof Choices) {
                 newList.set(newList.size() - 1,
                         new HistoryMessage(String.valueOf(newList.size() - 1), "1",
                                 ((Choices) item).getNegativeChoice(), 0, true)
                 );
                 messageListFragmentWeakReference.get().updateMessageList(newList);
-                newList.add(
-                        new HistoryMessage(String.valueOf(newList.size()), "1",
-                                ((Choices) item).getNegativeMessageAnswer(), 0, false)
-                );
-                messageListFragmentWeakReference.get().updateMessageList(newList);
+                runDelayedMessage(new Runnable() {
+                    @Override
+                    public void run() {
+                        newList.add(
+                                new HistoryMessage(String.valueOf(newList.size()), "1",
+                                        ((Choices) item).getNegativeMessageAnswer(), 0, false)
+                        );
+                        messageListFragmentWeakReference.get().updateMessageList(newList);
+                        messageListFragmentWeakReference.get().hideUserTyping();
+                        messageListFragmentWeakReference.get().clearAnimation();
+                        messageListFragmentWeakReference.get().scrollToBottom();
+                        gameLoop();
+                    }
+                });
                 this.listItems = newList;
-                gameLoop();
             }
         }
     }
@@ -190,90 +223,5 @@ public class ListFragmentPresenter {
         return lastIndex;
     }
 
-    static class SaveGameDataOnDestroyTask extends AsyncTask<User, Void, Void> {
-        @Override
-        protected Void doInBackground(User... users) {
-            DataRepository dataRepository = new DataRepository();
-            dataRepository.updateUserInfo(users[0]);
-            return null;
-        }
-    }
 
-    static class UserProgressAsyncTask extends AsyncTask<Void, Void, Integer> {
-
-        WeakReference<ListFragmentPresenter> listFragmentPresenterWeakReference;
-
-
-        public UserProgressAsyncTask(ListFragmentPresenter listFragmentPresenterWeakReference) {
-            this.listFragmentPresenterWeakReference = new WeakReference<>(listFragmentPresenterWeakReference);
-        }
-
-        @Override
-        protected Integer doInBackground(Void... voids) {
-            return listFragmentPresenterWeakReference.get()
-                    .dataRepository.getUserProgress("1");
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            listFragmentPresenterWeakReference.get().setLastIndex(integer);
-            listFragmentPresenterWeakReference.get()
-                    .messageListFragmentWeakReference.get()
-                    .setGameProgress(integer);
-            Log.d("lasyInd", "onGameStart: " + listFragmentPresenterWeakReference.get().getLastIndex());
-            listFragmentPresenterWeakReference.get().gameLoop();
-        }
-    }
-
-    static class GameLoopAsyncTask extends AsyncTask<List<ListItem>, Void, List<ListItem>> {
-
-        int lastIndex;
-        boolean gameStop;
-        WeakReference<ListFragmentPresenter> listFragmentPresenterWeakReference;
-        DataRepository dataRepository;
-
-        public GameLoopAsyncTask(int lastIndex, ListFragmentPresenter listFragmentPresenterWeakReference) {
-            this.listFragmentPresenterWeakReference = new WeakReference<>(listFragmentPresenterWeakReference);
-            this.lastIndex = lastIndex;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            dataRepository = listFragmentPresenterWeakReference.get().dataRepository;
-            gameStop = false;
-        }
-
-
-        @Override
-        protected List<ListItem> doInBackground(List<ListItem>... lists) {
-            List<ListItem> listItems = new ArrayList<>(lists[0]);
-            GameMessage gameMessage = dataRepository.getMessageById(lastIndex + 1);
-            if (gameMessage != null) {
-                listItems.add(gameMessage);
-                if (gameMessage.getChoices() != null) {
-                    listItems.add(gameMessage.getChoices());
-                    gameStop = true;
-                }
-            } else {
-                gameStop = true;
-            }
-            return listItems;
-        }
-
-        @Override
-        protected void onPostExecute(List<ListItem> listItems) {
-            ListFragmentPresenter listFragmentPresenter = listFragmentPresenterWeakReference.get();
-            if (listFragmentPresenter != null) {
-                MessageListFragment fragment = listFragmentPresenter.messageListFragmentWeakReference.get();
-                if (fragment != null) {
-                    fragment.updateMessageList(listItems);
-                    fragment.hideUserTyping();
-                    fragment.clearAnimation();
-                    listFragmentPresenter.setLastIndex(lastIndex + 1);
-                    fragment.setGameProgress(lastIndex + 1);
-                    listFragmentPresenter.checkGameState(listItems, gameStop);
-                }
-            }
-        }
-    }
 }

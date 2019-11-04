@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     private boolean isFirstRun;
     private MainActivityPresenter mainActivityPresenter;
-    DataRepository dataRepository;
+    private DataRepository dataRepository;
     private Fragment listFragment;
 
     @Override
@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         setContentView(R.layout.activity_main);
 
         isFirstRun = savedInstanceState == null || savedInstanceState.getByte(FIRST_RUN) == 1;
-        dataRepository = new DataRepository();
+        dataRepository = DataRepository.getInstance();
         mainActivityPresenter = new MainActivityPresenter(this, dataRepository);
         if (savedInstanceState != null && !isFirstRun) {
             this.listFragment = getSupportFragmentManager().getFragment(savedInstanceState, LIST_FRAGMENT);
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putByte(FIRST_RUN, (byte) (isFirstRun ? 1 : 0));
-        if (this.listFragment != null) {
+        if (this.listFragment != null && listFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, LIST_FRAGMENT, listFragment);
         }
     }
