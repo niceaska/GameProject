@@ -1,44 +1,48 @@
 package ru.niceaska.gameproject.presentation.view;
 
 import android.animation.ObjectAnimator;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MessageAppearItemAnimator extends DefaultItemAnimator {
 
+    private ObjectAnimator translationX;
+    private ObjectAnimator alphaAnimator;
+
     @Override
     public boolean animateAdd(RecyclerView.ViewHolder holder) {
         if (holder instanceof MessagesAdapter.MessageViewHolder) {
-            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f);
-            objectAnimator.setDuration(1500);
-            objectAnimator.setInterpolator(new AccelerateInterpolator());
-            objectAnimator.start();
+            alphaAnimator = ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f);
+            alphaAnimator.setDuration(1500);
+            alphaAnimator.setInterpolator(new AccelerateInterpolator());
+            alphaAnimator.start();
             return true;
         } else if (holder instanceof MessagesAdapter.ButtonChoicesViewHolder) {
-            holder.itemView.setTranslationX(-1000f);
-            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(holder.itemView, "translationX", -1000f, 0f);
-            objectAnimator.setDuration(1500);
-            objectAnimator.setInterpolator(new AccelerateInterpolator());
-            objectAnimator.start();
+            holder.itemView.setTranslationX(-1200f);
+            translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", -1200f, 0f);
+            translationX.setDuration(1500);
+            translationX.setInterpolator(new AccelerateInterpolator());
+            translationX.start();
             return true;
         }
         return super.animateAdd(holder);
     }
 
+
     @Override
-    public boolean animateDisappearance(@NonNull RecyclerView.ViewHolder viewHolder, @NonNull ItemHolderInfo preLayoutInfo, @Nullable ItemHolderInfo postLayoutInfo) {
-        if (viewHolder instanceof MessagesAdapter.MessageViewHolder) {
-            viewHolder.itemView.setVisibility(View.GONE);
-            return true;
-        } else if (viewHolder instanceof MessagesAdapter.ButtonChoicesViewHolder) {
-            viewHolder.itemView.setVisibility(View.GONE);
+    public boolean animateRemove(RecyclerView.ViewHolder holder) {
+        if (holder instanceof MessagesAdapter.ButtonChoicesViewHolder) {
+            holder.itemView.setTranslationX(-1200f);
+            ObjectAnimator translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", 0f, 1200f);
+            translationX.setDuration(1000);
+            translationX.setInterpolator(new AccelerateInterpolator());
+            translationX.start();
             return true;
         }
-        return super.animateDisappearance(viewHolder, preLayoutInfo, postLayoutInfo);
+        return super.animateRemove(holder);
     }
+
+
 }
