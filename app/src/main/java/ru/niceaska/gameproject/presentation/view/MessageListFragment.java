@@ -27,11 +27,9 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
 
     private final int ANIMATION_DURATION = 5500;
     private RecyclerView recyclerView;
-    private int gameProgress;
     private ListFragmentPresenter listFragmentPresenter;
     private LinearLayoutManager layoutManager;
     private TypeWriter typeWriter;
-    private boolean isSaveState;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
     private ObjectAnimator animator;
 
@@ -61,6 +59,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         );
         typeWriter = v.findViewById(R.id.textView);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new MessageAppearItemAnimator());
         initRecyclerListeners();
         return v;
     }

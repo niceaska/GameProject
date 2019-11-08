@@ -2,4 +2,6 @@
     <string name="app_name">Окна домов</string>
     <string name="start_game">Начать игру</string>
     <string name="printing">Печатает</string>
+    <string name="hero_name">Антон</string>
+    <string name="you">Вы</string>
 </resources>

@@ -15,11 +15,7 @@ public class MainActivityPresenter {
         this.dataRepository = dataRepository;
     }
 
-    public void gameRun(boolean isSavedState) {
-        if (isSavedState) {
-            activityWeakReference.get().startGame();
-            return;
-        }
+    public void gameRun() {
         IOnGameRunCheckListener listener = new IOnGameRunCheckListener() {
             @Override
             public void onChecked(boolean isFirstRun) {

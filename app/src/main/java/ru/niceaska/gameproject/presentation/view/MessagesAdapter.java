@@ -102,12 +102,10 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     static class MessageViewHolder extends RecyclerView.ViewHolder {
 
         TextView messageText;
-        TextView messgaeTime;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.text_message_body);
-            messgaeTime = itemView.findViewById(R.id.text_message_time);
         }
 
         void onBind(String text) {

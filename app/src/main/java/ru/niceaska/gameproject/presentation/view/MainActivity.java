@@ -13,7 +13,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     static final String FIRST_RUN = "firstRun";
 
-    private boolean isFirstRun;
     private MainActivityPresenter mainActivityPresenter;
     private DataRepository dataRepository;
 
@@ -22,22 +21,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isFirstRun = savedInstanceState == null || savedInstanceState.getByte(FIRST_RUN) == 1;
         dataRepository = DataRepository.getInstance();
         mainActivityPresenter = new MainActivityPresenter(this, dataRepository);
-        if (savedInstanceState != null && !isFirstRun) {
-            mainActivityPresenter.gameRun(true);
-        } else {
-            mainActivityPresenter.gameRun(false);
-            isFirstRun = false;
-        }
+        mainActivityPresenter.gameRun();
 
-    }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putByte(FIRST_RUN, (byte) (isFirstRun ? 1 : 0));
     }
 
     @Override
