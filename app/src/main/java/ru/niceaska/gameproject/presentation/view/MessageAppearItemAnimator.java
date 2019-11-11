@@ -8,20 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MessageAppearItemAnimator extends DefaultItemAnimator {
 
-    private ObjectAnimator translationX;
-    private ObjectAnimator alphaAnimator;
-
     @Override
     public boolean animateAdd(RecyclerView.ViewHolder holder) {
         if (holder instanceof MessagesAdapter.MessageViewHolder) {
-            alphaAnimator = ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f);
+            ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f);
             alphaAnimator.setDuration(1500);
             alphaAnimator.setInterpolator(new AccelerateInterpolator());
             alphaAnimator.start();
             return true;
         } else if (holder instanceof MessagesAdapter.ButtonChoicesViewHolder) {
             holder.itemView.setTranslationX(-1200f);
-            translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", -1200f, 0f);
+            ObjectAnimator translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", -1200f, 0f);
             translationX.setDuration(1500);
             translationX.setInterpolator(new AccelerateInterpolator());
             translationX.start();
@@ -35,7 +32,7 @@ public class MessageAppearItemAnimator extends DefaultItemAnimator {
     public boolean animateRemove(RecyclerView.ViewHolder holder) {
         if (holder instanceof MessagesAdapter.ButtonChoicesViewHolder) {
             holder.itemView.setTranslationX(-1200f);
-            ObjectAnimator translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", 0f, 1200f);
+            ObjectAnimator translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", 0f, 12000f);
             translationX.setDuration(1000);
             translationX.setInterpolator(new AccelerateInterpolator());
             translationX.start();
@@ -43,6 +40,4 @@ public class MessageAppearItemAnimator extends DefaultItemAnimator {
         }
         return super.animateRemove(holder);
     }
-
-
 }

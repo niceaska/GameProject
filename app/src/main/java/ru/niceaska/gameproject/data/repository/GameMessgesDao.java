@@ -7,6 +7,8 @@ import androidx.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Single;
 import ru.niceaska.gameproject.data.model.GameMessage;
 
 
@@ -16,11 +18,11 @@ public interface GameMessgesDao {
     List<GameMessage> getAllMessges();
 
     @Query("SELECT * from message WHERE id = :id")
-    GameMessage getById(long id);
+    Single<GameMessage> getById(long id);
 
     @Insert
-    long[] insertMessge(GameMessage... gameMessages);
+    Completable insertMessge(GameMessage... gameMessages);
 
     @Insert
-    long[] insertMessge(List<GameMessage> gameMessages);
+    Completable insertMessge(List<GameMessage> gameMessages);
 }

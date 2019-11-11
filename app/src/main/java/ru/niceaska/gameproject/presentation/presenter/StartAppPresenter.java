@@ -1,55 +1,74 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
 import android.app.Activity;
+import android.content.res.AssetManager;
+import android.util.Log;
+import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
 import ru.niceaska.gameproject.data.repository.DataRepository;
-import ru.niceaska.gameproject.data.repository.IOnFirstLoadDataListener;
 import ru.niceaska.gameproject.presentation.view.GameStartFragment;
 
 public class StartAppPresenter {
-    WeakReference<GameStartFragment> gameStartFragmentWeakReference;
-    DataRepository dataRepository;
+    private WeakReference<GameStartFragment> gameStartFragmentWeakReference;
+    private DataRepository dataRepository;
+    private CompositeDisposable compositeDisposable;
 
-/*    private List<GameMessage> meaageTest = Arrays.asList(
-            new GameMessage("Привет анон я только недавно сюда приехал и заметил странное. ",
-                    0,
-                    false,
-                    null
-            ),
-            new GameMessage("Кажется по дороге кто-то идет",
-                    0,
-                    false,
-                    null),
-            new GameMessage("Похоже это какая то старушка. Что делать?",
-                    0,
-                    false,
-                    new Choices("Помочь", "Игнорировать",
-                            "Помоги ей перейти дорогу", "Нафиг бабушек",
-                            "хорошо я помогу", "Да и хрен с ней")
-            ));*/
+    private static final String FILE_NAME = "scenario.json";
+    private static final String TAG = StartAppPresenter.class.getName();
 
     public StartAppPresenter(GameStartFragment gameStartFragmentWeakReference, DataRepository dataRepository) {
         this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragmentWeakReference);
         this.dataRepository = dataRepository;
+        this.compositeDisposable = new CompositeDisposable();
     }
 
     public void loadData() {
         User user = new User(new UserPojo("1", "test", 0), new ArrayList<HistoryMessage>());
-        IOnFirstLoadDataListener listener = new IOnFirstLoadDataListener() {
-            @Override
-            public void onFirsLoad() {
-                gameStartFragmentWeakReference.get().beginNewGame();
-            }
-        };
         if (gameStartFragmentWeakReference.get() != null) {
             Activity activity = gameStartFragmentWeakReference.get().getActivity();
-            dataRepository.firstLoadData(user, listener, activity);
+            if (activity != null) {
+                AssetManager assetManager = activity.getAssets();
+                try {
+                    InputStream is = assetManager.open(FILE_NAME);
+                    Reader open = new InputStreamReader(is);
+                    compositeDisposable.add(dataRepository.firstLoadData(user, open).subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(o -> {
+                                    },
+                                    throwable -> {
+                                        Toast.makeText(activity.getApplicationContext(),
+                                                activity.getResources().getString(R.string.error_data_loading),
+                                                Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "loadData: " + throwable.getMessage());
+                                        open.close();
+                                    },
+                                    () -> {
+                                        gameStartFragmentWeakReference.get().beginNewGame();
+                                        open.close();
+                                    }));
+                } catch (IOException e) {
+                    Log.d(TAG, "loadData: " + e.getMessage());
+                }
+            }
         }
     }
+
+    public void unSubscribe() {
+        compositeDisposable.clear();
+    }
+
 }

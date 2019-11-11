@@ -4,4 +4,5 @@
     <string name="printing">Печатает</string>
     <string name="hero_name">Антон</string>
     <string name="you">Вы</string>
+    <string name="error_data_loading">Ошибка загрузки данных</string>
 </resources>

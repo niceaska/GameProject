@@ -25,7 +25,7 @@ import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresent
 
 public class MessageListFragment extends Fragment implements IMessageListFragment {
 
-    private final int ANIMATION_DURATION = 5500;
+    private final int ANIMATION_DURATION = 3000;
     private RecyclerView recyclerView;
     private ListFragmentPresenter listFragmentPresenter;
     private LinearLayoutManager layoutManager;
@@ -45,7 +45,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        listFragmentPresenter = new ListFragmentPresenter(this, DataRepository.getInstance());
+        listFragmentPresenter = new ListFragmentPresenter(this, new DataRepository());
         listFragmentPresenter.onGameStart();
     }
 
@@ -69,13 +69,17 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     public void showAnimation(int repeatCount) {
         CharSequence startString = requireContext().getResources().getString(R.string.printing);
         StringBuilder stringBuilder = new StringBuilder();
+        initTypingAnimator(startString, stringBuilder);
+        animator.start();
+    }
+
+    private void initTypingAnimator(CharSequence startString, StringBuilder stringBuilder) {
         typeWriter.setAnimatedText(stringBuilder.append(startString).append("..."));
         animator = ObjectAnimator.ofInt(typeWriter, "textVisibility",
-                startString.length(), startString.length() + 3);
+                startString.length(), startString.length() + 4);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setStartDelay(200);
         animator.setDuration(ANIMATION_DURATION);
-        animator.start();
     }
 
     @Override
@@ -91,7 +95,9 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
 
     @Override
     public void clearAnimation() {
-        animator.end();
+        if (animator != null) {
+            animator.end();
+        }
     }
 
     @Override
@@ -122,10 +128,6 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         messagesAdapter.updateList(newList);
     }
 
-    @Override
-    public void onFinalDestroy() {
-        listFragmentPresenter.saveOnDestroy(messagesAdapter.getListObj());
-    }
 
 
     @Override
@@ -139,6 +141,6 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     @Override
     public void onDetach() {
         super.onDetach();
-        listFragmentPresenter.detachView();
+        listFragmentPresenter.saveOnDetachView(messagesAdapter.getListObj());
     }
 }

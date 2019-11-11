@@ -11,6 +11,4 @@ public interface IMessageListFragment {
     void clearAnimation();
     void scrollToBottom();
     void updateMessageList(List<ListItem> newList);
-
-    void onFinalDestroy();
 }

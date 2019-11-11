@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
+import io.reactivex.Single;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
@@ -14,10 +15,10 @@ import ru.niceaska.gameproject.data.model.UserPojo;
 public abstract class UserDao {
     @Transaction
     @Query("SELECT * FROM UserPojo WHERE userId = :userId")
-    public abstract User getUserById(String userId);
+    public abstract Single<User> getUserById(String userId);
 
     @Query("SELECT progress FROM UserPojo WHERE userId = :userId")
-    public abstract int getuserProgress(String userId);
+    public abstract Single<Integer> getuserProgress(String userId);
 
     @Transaction
     public void insert(User user) {

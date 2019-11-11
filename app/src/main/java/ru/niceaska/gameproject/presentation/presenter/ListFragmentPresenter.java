@@ -1,12 +1,14 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
-import android.os.Handler;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.data.model.Choices;
 import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
@@ -15,9 +17,6 @@ import ru.niceaska.gameproject.data.model.MessageItem;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
 import ru.niceaska.gameproject.data.repository.DataRepository;
-import ru.niceaska.gameproject.data.repository.IOnHistoryUpdatedListener;
-import ru.niceaska.gameproject.data.repository.IOnMessageLoadListener;
-import ru.niceaska.gameproject.data.repository.IOnUserProgressLoadListener;
 import ru.niceaska.gameproject.presentation.view.MessageListFragment;
 
 public class ListFragmentPresenter {
@@ -32,49 +31,54 @@ public class ListFragmentPresenter {
     private List<ListItem> listItems;
     private WeakReference<MessageListFragment> messageListFragmentWeakReference;
     private DataRepository dataRepository;
-    private Handler handler;
+    private CompositeDisposable compositeDisposable;
 
     public ListFragmentPresenter(MessageListFragment messageListFragmentWeakReference,
                                  DataRepository dataRepository) {
         this.messageListFragmentWeakReference = new WeakReference<>(messageListFragmentWeakReference);
         this.dataRepository = dataRepository;
-        this.handler = new Handler();
+        this.compositeDisposable = new CompositeDisposable();
     }
 
 
     public void onGameStart() {
-
-        final IOnUserProgressLoadListener progressLoadListener = new IOnUserProgressLoadListener() {
-            @Override
-            public void onLoadData(int progress) {
-                setLastIndex(progress);
-                getNextIndex();
-                gameLoop(getNextIndex());
-            }
-        };
-        final IOnHistoryUpdatedListener historyUpdatedListener = new IOnHistoryUpdatedListener() {
-            @Override
-            public void onHistoryLoad(List<HistoryMessage> historyMessages) {
-                List<ListItem> messageList = new ArrayList<ListItem>(historyMessages);
-                if (!historyMessages.isEmpty()) {
-                    ListItem lastItem = messageList.get(messageList.size() - 1);
-                    if (((HistoryMessage) lastItem).getChoices() != null) {
-                        messageList.add(((HistoryMessage) lastItem).getChoices());
+        compositeDisposable.add(dataRepository.loadHistory("1")
+                .subscribeOn(Schedulers.io())
+                .map(historyMessages -> {
+                    List<ListItem> messageList = new ArrayList<>(historyMessages);
+                    if (!historyMessages.isEmpty()) {
+                        ListItem lastItem = messageList.get(messageList.size() - 1);
+                        if (((HistoryMessage) lastItem).getChoices() != null) {
+                            messageList.add(((HistoryMessage) lastItem).getChoices());
+                        }
                     }
-                }
-                listItems = messageList;
-                MessageListFragment fragment = messageListFragmentWeakReference.get();
-                if (fragment != null) {
-                    fragment.updateMessageList(messageList);
-                    fragment.scrollToBottom();
-                }
-                if (historyMessages.isEmpty() || !(listItems.get(listItems.size() - 1) instanceof Choices)) {
-                    dataRepository.loadUserProgress(progressLoadListener);
-                }
-            }
-        };
-        dataRepository.loadHistory("1", historyUpdatedListener);
+                    listItems = messageList;
+                    return messageList;
+                }).map(messageList -> {
+                    if (messageList.isEmpty() || !(messageList.get(messageList.size() - 1) instanceof Choices)) {
+                        compositeDisposable.add(dataRepository.loadUserProgress("1")
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(integer -> {
+                                    lastIndex = integer;
+                                    gameLoop(getNextIndex());
+                                }, throwable -> {
+                                }));
+                    }
+                    return messageList;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::updateMessages, throwable -> {
+                }));
 
+    }
+
+    private void updateMessages(List<ListItem> historyMessages) {
+        MessageListFragment fragment = messageListFragmentWeakReference.get();
+        if (fragment != null) {
+            fragment.updateMessageList(historyMessages);
+            fragment.scrollToBottom();
+        }
     }
 
     private int getNextIndex() {
@@ -87,46 +91,38 @@ public class ListFragmentPresenter {
 
     private void gameLoop(final int nextIndex) {
         if (listItems != null && nextIndex < 9) {
-            final ListFragmentPresenter listFragmentPresenter = this;
-            Runnable task = new Runnable() {
-                @Override
-                public void run() {
-                    IOnMessageLoadListener listener = new IOnMessageLoadListener() {
-                        @Override
-                        public void onDataLoaded(List<ListItem> listItems) {
-                            MessageListFragment fragment = listFragmentPresenter.messageListFragmentWeakReference.get();
-                            if (fragment != null) {
-                                fragment.updateMessageList(listItems);
-                                fragment.scrollToBottom();
-                                fragment.hideUserTyping();
-                                fragment.clearAnimation();
-                                listFragmentPresenter.setLastIndex(nextIndex);
-                                if (!listItems.isEmpty()) {
-                                    ListItem item = listItems.get(listItems.size() - 1);
-                                    listFragmentPresenter.checkGameState(listItems, item instanceof Choices);
-                                }
+            final Random random = new Random();
+            final int rand = random.nextInt(5) + 5;
+            MessageListFragment fragment = messageListFragmentWeakReference.get();
+            if (fragment != null && fragment.isAdded()) {
+                fragment.showUserTyping();
+                fragment.showAnimation(rand);
+            }
+            compositeDisposable.add(dataRepository.loadNewGameMessage(nextIndex, listItems)
+                    .subscribeOn(Schedulers.io())
+                    .delay(3, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((items) -> {
+                        MessageListFragment listFragment = messageListFragmentWeakReference.get();
+                        listItems = items;
+                        if (listFragment != null) {
+                            listFragment.updateMessageList(items);
+                            listFragment.scrollToBottom();
+                            listFragment.hideUserTyping();
+                            listFragment.clearAnimation();
+                            setLastIndex(nextIndex);
+                            if (!items.isEmpty()) {
+                                ListItem item = items.get(items.size() - 1);
+                                checkGameState(items, item instanceof Choices);
                             }
                         }
-                    };
-                    dataRepository.loadNewGameMessage(nextIndex, listener, listItems);
-                }
-            };
-            runDelayedMessage(task);
+                    }, throwable -> {
+                    }));
         }
-    }
-
-    private void runDelayedMessage(Runnable task) {
-        final Random random = new Random();
-        final int rand = random.nextInt(5) + 5;
-        MessageListFragment fragment = messageListFragmentWeakReference.get();
-        if (fragment != null && fragment.isAdded()) {
-            fragment.showUserTyping();
-            fragment.showAnimation(rand);
-            handler.postDelayed(task, rand * 1000);
         }
-    }
 
-    public void saveOnDestroy(List<ListItem> listItems) {
+
+    private void saveOnDestroy(List<ListItem> listItems) {
 
         if (listItems.isEmpty()) return;
 
@@ -144,7 +140,7 @@ public class ListFragmentPresenter {
         }
         UserPojo userPojo = new UserPojo("1", "test", lastIndex);
         User user = new User(userPojo, historyMessagesList);
-        dataRepository.saveUserData(user);
+        dataRepository.saveUserData(user).subscribe();
     }
 
 
@@ -179,8 +175,8 @@ public class ListFragmentPresenter {
                                 ((Choices) item).getNegativeMessageAnswer(), null)
                 );
                 messageListFragmentWeakReference.get().updateMessageList(newList);
-                gameLoop(((Choices) item).getPositiveMessageAnswer());
                 this.listItems = newList;
+                gameLoop(((Choices) item).getPositiveMessageAnswer());
             }
         }
     }
@@ -196,19 +192,28 @@ public class ListFragmentPresenter {
                                 ((Choices) item).getNegativeMessageAnswer(), null)
                 );
                 messageListFragmentWeakReference.get().updateMessageList(newList);
-                gameLoop(((Choices) item).getNegativeMessageAnswer());
                 this.listItems = newList;
+                gameLoop(((Choices) item).getNegativeMessageAnswer());
             }
         }
     }
 
+    public void saveOnDetachView(List<ListItem> itemList) {
+        saveOnDestroy(itemList);
+        detachView();
+        clearDisposable();
+    }
 
     private void setLastIndex(int lastIndex) {
         this.lastIndex = lastIndex;
     }
 
-    public void detachView() {
+    private void detachView() {
         messageListFragmentWeakReference.clear();
+    }
+
+    private void clearDisposable() {
+        compositeDisposable.clear();
     }
 
 }
