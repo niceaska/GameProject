@@ -1,27 +1,18 @@
-package ru.niceaska.gameproject.data.model;
+package ru.niceaska.gameproject.domain.model;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
+import ru.niceaska.gameproject.data.model.ListItem;
 
-@Entity
-public class Choices {
-
-
-    @ColumnInfo(name = "postive_label")
+public class MessageChoices extends ListItem {
     private String postiveChoiceLabel;
-    @ColumnInfo(name = "negative_label")
     private String negativeChoiceLabel;
-    @ColumnInfo(name = "postive_choice")
     private String positiveChoice;
-    @ColumnInfo(name = "negative_choice")
     private String negativeChoice;
-    @ColumnInfo(name = "positive_answer")
     private int positiveMessageAnswer;
-    @ColumnInfo(name = "negative_answer")
     private int negativeMessageAnswer;
 
-    public Choices(String postiveChoiceLabel, String negativeChoiceLabel, String positiveChoice,
-                   String negativeChoice, int positiveMessageAnswer, int negativeMessageAnswer) {
+    public MessageChoices(String postiveChoiceLabel, String negativeChoiceLabel,
+                          String positiveChoice, String negativeChoice,
+                          int positiveMessageAnswer, int negativeMessageAnswer) {
         this.postiveChoiceLabel = postiveChoiceLabel;
         this.negativeChoiceLabel = negativeChoiceLabel;
         this.positiveChoice = positiveChoice;
@@ -29,7 +20,6 @@ public class Choices {
         this.positiveMessageAnswer = positiveMessageAnswer;
         this.negativeMessageAnswer = negativeMessageAnswer;
     }
-
 
     public String getPostiveChoiceLabel() {
         return postiveChoiceLabel;
@@ -65,17 +55,17 @@ public class Choices {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Choices choices = (Choices) o;
+        MessageChoices that = (MessageChoices) o;
 
-        if (positiveMessageAnswer != choices.positiveMessageAnswer) return false;
-        if (negativeMessageAnswer != choices.negativeMessageAnswer) return false;
-        if (postiveChoiceLabel != null ? !postiveChoiceLabel.equals(choices.postiveChoiceLabel) : choices.postiveChoiceLabel != null)
+        if (positiveMessageAnswer != that.positiveMessageAnswer) return false;
+        if (negativeMessageAnswer != that.negativeMessageAnswer) return false;
+        if (postiveChoiceLabel != null ? !postiveChoiceLabel.equals(that.postiveChoiceLabel) : that.postiveChoiceLabel != null)
             return false;
-        if (negativeChoiceLabel != null ? !negativeChoiceLabel.equals(choices.negativeChoiceLabel) : choices.negativeChoiceLabel != null)
+        if (negativeChoiceLabel != null ? !negativeChoiceLabel.equals(that.negativeChoiceLabel) : that.negativeChoiceLabel != null)
             return false;
-        if (positiveChoice != null ? !positiveChoice.equals(choices.positiveChoice) : choices.positiveChoice != null)
+        if (positiveChoice != null ? !positiveChoice.equals(that.positiveChoice) : that.positiveChoice != null)
             return false;
-        return negativeChoice != null ? negativeChoice.equals(choices.negativeChoice) : choices.negativeChoice == null;
+        return negativeChoice != null ? negativeChoice.equals(that.negativeChoice) : that.negativeChoice == null;
     }
 
     @Override

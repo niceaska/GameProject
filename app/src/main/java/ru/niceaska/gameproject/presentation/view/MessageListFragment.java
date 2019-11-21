@@ -66,7 +66,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
 
 
     @Override
-    public void showAnimation(int repeatCount) {
+    public void showAnimation() {
         CharSequence startString = requireContext().getResources().getString(R.string.printing);
         StringBuilder stringBuilder = new StringBuilder();
         initTypingAnimator(startString, stringBuilder);

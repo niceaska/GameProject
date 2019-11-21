@@ -5,7 +5,7 @@ import java.util.List;
 import ru.niceaska.gameproject.data.model.ListItem;
 
 public interface IMessageListFragment {
-    void showAnimation(int repeatCount);
+    void showAnimation();
     void showUserTyping();
     void hideUserTyping();
     void clearAnimation();

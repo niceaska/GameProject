@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity(tableName = "message")
-public class GameMessage extends MessageItem {
+public class GameMessage {
 
     @Expose
     @PrimaryKey(autoGenerate = true)
@@ -63,23 +63,8 @@ public class GameMessage extends MessageItem {
         this.id = id;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setGamer(boolean gamer) {
-        isGamer = gamer;
-    }
-
-    public void setChoices(Choices choices) {
-        this.choices = choices;
-    }
-
     public int getNextMessage() {
         return nextMessage;
     }
 
-    public void setNextMessage(int nextMessage) {
-        this.nextMessage = nextMessage;
-    }
 }

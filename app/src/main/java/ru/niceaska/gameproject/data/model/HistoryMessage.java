@@ -14,7 +14,7 @@ import androidx.room.ForeignKey;
                 childColumns = "user",
                 onDelete = ForeignKey.CASCADE),
         primaryKeys = {"id", "user"})
-public class HistoryMessage extends MessageItem {
+public class HistoryMessage {
     @NonNull
     @ColumnInfo(name = "id", index = true)
     private String id;
@@ -53,16 +53,9 @@ public class HistoryMessage extends MessageItem {
         return user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
 
     public String getMessage() {
         return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
 
@@ -70,9 +63,6 @@ public class HistoryMessage extends MessageItem {
         return isGamer;
     }
 
-    public void setGamer(boolean gamer) {
-        isGamer = gamer;
-    }
 
     public Choices getChoices() {
         return choices;
@@ -82,11 +72,5 @@ public class HistoryMessage extends MessageItem {
         return nextMessage;
     }
 
-    public void setNextMessage(int nextMessage) {
-        this.nextMessage = nextMessage;
-    }
 
-    public void setChoices(Choices choices) {
-        this.choices = choices;
-    }
 }

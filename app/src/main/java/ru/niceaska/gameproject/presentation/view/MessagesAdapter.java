@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.niceaska.gameproject.R;
-import ru.niceaska.gameproject.data.model.Choices;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.data.model.MessageItem;
+import ru.niceaska.gameproject.domain.model.MessageChoices;
+import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class MessagesAdapter extends RecyclerView.Adapter {
 
@@ -33,7 +33,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         Object item = listObj.get(position);
         if (item instanceof MessageItem) {
             return ((MessageItem) item).isGamer() ? GAMER_ID : MESSAGE_ID;
-        } else if (item instanceof Choices) {
+        } else if (item instanceof MessageChoices) {
             return CHOICE_ID;
         } else {
             throw new IllegalArgumentException();
@@ -65,7 +65,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         if (holder instanceof MessageViewHolder) {
             ((MessageViewHolder) holder).onBind(((MessageItem) listObj.get(position)).getMessage());
         } else if (holder instanceof  ButtonChoicesViewHolder) {
-            ((ButtonChoicesViewHolder) holder).onBind((Choices) listObj.get(position));
+            ((ButtonChoicesViewHolder) holder).onBind((MessageChoices) listObj.get(position));
         } else {
             throw new IllegalArgumentException();
         }
@@ -128,7 +128,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
             this.listener = listener;
         }
 
-        void onBind(final Choices choice) {
+        void onBind(final MessageChoices choice) {
             buttonLeft.setText(choice.getNegativeChoiceLabel());
             buttonLeft.setOnClickListener(new View.OnClickListener() {
                 @Override

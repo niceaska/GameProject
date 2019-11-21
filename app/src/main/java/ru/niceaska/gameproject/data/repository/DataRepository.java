@@ -11,17 +11,21 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.data.model.User;
+import ru.niceaska.gameproject.data.model.UserPojo;
+import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class DataRepository {
 
-    private static DataRepository instance;
+    public static final String USER_ID = "1";
+    public static final String USER_NAME = "test";
     private AppDatabase database;
+    private MessageConverter messageConverter = new MessageConverter();
+    private SaveMessageConverter saveMessageConverter = new SaveMessageConverter();
 
 
     public DataRepository() {
@@ -36,13 +40,16 @@ public class DataRepository {
         return database.getGameMessgeDao().insertMessge(messageList);
     }
 
-    private Single<GameMessage> getMessageById(long id) {
-        return database.getGameMessgeDao().getById(id);
+    private Single<MessageItem> getMessageById(long id) {
+        return database.getGameMessgeDao().getById(id)
+                .map(gameMessage -> messageConverter.convertFromGameMessage(gameMessage));
     }
 
 
-    public Completable saveUserData(User user) {
-        return insertUserInformation(user).subscribeOn(Schedulers.io());
+    public Completable saveUserData(int lastIndex, List<ListItem> messageItems) {
+        UserPojo userPojo = new UserPojo(USER_ID, USER_NAME, lastIndex);
+        User user = new User(userPojo, saveMessageConverter.convertToHistory(messageItems));
+        return insertUserInformation(user);
     }
 
     public Single<List<ListItem>> loadNewGameMessage(int nextIndex, List<ListItem> listItems) {
@@ -56,8 +63,6 @@ public class DataRepository {
             }
             return items;
         });
-
-        //new GameLoopAsyncTask(lastIndex, listener).execute(listItems);
     }
 
     public Single<Integer> loadUserProgress(String userId) {
@@ -68,7 +73,8 @@ public class DataRepository {
         return database.getUserDao().getUserById(userId).map(user -> user == null || user.savedMessages.isEmpty());
     }
 
-    public Observable<Object> firstLoadData(User user, Reader open) {
+    public Observable<Object> firstLoadData(Reader open) {
+        User user = new User(new UserPojo(USER_ID, USER_NAME, 0), new ArrayList<HistoryMessage>());
         return Observable.fromCallable(() -> {
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<GameMessage>>() {
@@ -78,8 +84,8 @@ public class DataRepository {
                 .mergeWith(insertUserInformation(user));
     }
 
-    public Single<List<HistoryMessage>> loadHistory(String userId) {
-        return database.getUserDao().getUserById(userId).map(user -> user.savedMessages);
+    public Single<List<MessageItem>> loadHistory(String userId) {
+        return database.getUserDao().getUserById(userId).map(user -> messageConverter.convertFromHistory(user.savedMessages));
     }
 
 

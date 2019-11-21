@@ -4,11 +4,8 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 
-import ru.niceaska.gameproject.data.model.Choices;
-import ru.niceaska.gameproject.data.model.GameMessage;
-import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.data.model.MessageItem;
+import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class MessagesDiffCallback extends DiffUtil.Callback {
 
@@ -36,24 +33,16 @@ public class MessagesDiffCallback extends DiffUtil.Callback {
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
         Object oldItem = oldList.get(oldItemPosition);
         Object newItem = newList.get(newItemPosition);
-        if (oldItem instanceof GameMessage && newItem instanceof GameMessage) {
-            return ((GameMessage) oldItem).getId() == ((GameMessage) newItem).getId();
-        } else if (oldItem instanceof HistoryMessage && newItem instanceof HistoryMessage)
-            return ((HistoryMessage) oldItem).getId().equals(((HistoryMessage) newItem).getId());
+        if (oldItem instanceof MessageItem && newItem instanceof MessageItem) {
+            return ((MessageItem) oldItem).getId() == ((MessageItem) newItem).getId()
+                    && ((MessageItem) oldItem).isGamer() == ((MessageItem) newItem).isGamer();
+        }
         return false;
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        Object oldItem = oldList.get(oldItemPosition);
-        Object newItem = newList.get(newItemPosition);
-        if (oldItem instanceof MessageItem && newItem instanceof MessageItem) {
-            return ((MessageItem) oldItem).isGamer() == ((MessageItem) newItem).isGamer()
-                    && ((MessageItem) oldItem).getMessage().equals(((MessageItem) newItem).getMessage());
-        } else if (oldItem instanceof Choices && newItem instanceof Choices) {
-            return ((Choices) oldItem).getPositiveMessageAnswer() == ((Choices) newItem).getPositiveMessageAnswer()
-                    && ((Choices) oldItem).getNegativeMessageAnswer() == (((Choices) newItem).getNegativeMessageAnswer());
-        }
-        return false;
+        return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
     }
+
 }

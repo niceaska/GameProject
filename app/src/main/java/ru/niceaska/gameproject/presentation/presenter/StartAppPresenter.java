@@ -10,21 +10,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.R;
-import ru.niceaska.gameproject.data.model.HistoryMessage;
-import ru.niceaska.gameproject.data.model.User;
-import ru.niceaska.gameproject.data.model.UserPojo;
 import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.domain.FirstLoadDataInteractor;
 import ru.niceaska.gameproject.presentation.view.GameStartFragment;
 
 public class StartAppPresenter {
     private WeakReference<GameStartFragment> gameStartFragmentWeakReference;
-    private DataRepository dataRepository;
+    private FirstLoadDataInteractor firstLoadDataInteractor;
     private CompositeDisposable compositeDisposable;
 
     private static final String FILE_NAME = "scenario.json";
@@ -32,12 +29,11 @@ public class StartAppPresenter {
 
     public StartAppPresenter(GameStartFragment gameStartFragmentWeakReference, DataRepository dataRepository) {
         this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragmentWeakReference);
-        this.dataRepository = dataRepository;
+        this.firstLoadDataInteractor = new FirstLoadDataInteractor(dataRepository);
         this.compositeDisposable = new CompositeDisposable();
     }
 
     public void loadData() {
-        User user = new User(new UserPojo("1", "test", 0), new ArrayList<HistoryMessage>());
         if (gameStartFragmentWeakReference.get() != null) {
             Activity activity = gameStartFragmentWeakReference.get().getActivity();
             if (activity != null) {
@@ -45,7 +41,7 @@ public class StartAppPresenter {
                 try {
                     InputStream is = assetManager.open(FILE_NAME);
                     Reader open = new InputStreamReader(is);
-                    compositeDisposable.add(dataRepository.firstLoadData(user, open).subscribeOn(Schedulers.io())
+                    compositeDisposable.add(firstLoadDataInteractor.firstLoadData(open).subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(o -> {
                                     },
