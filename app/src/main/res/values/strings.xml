@@ -5,4 +5,6 @@
     <string name="hero_name">Антон</string>
     <string name="you">Вы</string>
     <string name="error_data_loading">Ошибка загрузки данных</string>
+    <string name="notification_title">Антону нужна твоя помощь!</string>
+    <string name="help_hero">Помоги ему найти выход из сложной ситуации.</string>
 </resources>

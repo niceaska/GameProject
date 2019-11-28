@@ -25,6 +25,7 @@ public class ListFragmentPresenter {
         POSITIVE
     }
 
+
     private int lastIndex;
     private List<ListItem> listItems;
     private WeakReference<MessageListFragment> messageListFragmentWeakReference;
@@ -153,12 +154,12 @@ public class ListFragmentPresenter {
     }
 
     public void saveOnDetachView(List<ListItem> itemList) {
-        saveGameInteractor.saveGame(lastIndex, itemList)
+        compositeDisposable.add(saveGameInteractor.saveGame(lastIndex, itemList)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         () -> Log.d("SAVE", "saveOnDetachView: "),
                         throwable -> Log.d("SAVE", "saveOnDetachView: " + throwable.getMessage())
-                );
+                ));
         detachView();
         clearDisposable();
     }

@@ -14,6 +14,7 @@ public class MainActivityPresenter {
 
     private WeakReference<IMainActivity> activityWeakReference;
     private DataRepository dataRepository;
+    private Disposable disposable;
 
     public MainActivityPresenter(IMainActivity activity, DataRepository dataRepository) {
         this.activityWeakReference = new WeakReference<IMainActivity>(activity);
@@ -21,18 +22,34 @@ public class MainActivityPresenter {
     }
 
     public void gameRun() {
-        Disposable disposable = dataRepository.checkFirstStart("1").subscribeOn(Schedulers.io())
+        planNotification();
+        disposable = dataRepository.checkFirstStart(DataRepository.USER_ID).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aBoolean -> {
-                    if (aBoolean) {
-                        activityWeakReference.get().showStartAppFragment();
-                    } else {
-                        activityWeakReference.get().startGame();
+                    if (activityWeakReference.get() != null) {
+                        if (aBoolean) {
+                            activityWeakReference.get().showStartAppFragment();
+                        } else {
+                            activityWeakReference.get().startGame();
+                        }
                     }
                 }, throwable -> {
                     if (throwable instanceof EmptyResultSetException) {
-                        activityWeakReference.get().showStartAppFragment();
+                        if (activityWeakReference.get() != null) {
+                            activityWeakReference.get().showStartAppFragment();
+                        }
                     }
                 });
+    }
+
+    private void planNotification() {
+        IMainActivity activity = activityWeakReference.get();
+        if (activity != null) {
+            activity.planningNotification();
+        }
+    }
+
+    public void clearDisposable() {
+        disposable.dispose();
     }
 }
