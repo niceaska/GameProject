@@ -15,9 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.di.components.DaggerGameComponent;
+import ru.niceaska.gameproject.di.components.DaggerGameScreenComponent;
+import ru.niceaska.gameproject.di.components.GameComponent;
+import ru.niceaska.gameproject.di.components.GameScreenComponent;
+import ru.niceaska.gameproject.di.modules.GameLoopInteractorModule;
+import ru.niceaska.gameproject.di.modules.GameStartModule;
+import ru.niceaska.gameproject.di.modules.SaveGameInteractorModule;
 import ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter;
 
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.NEGATIVE;
@@ -27,7 +36,13 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
 
     private final int ANIMATION_DURATION = 3000;
     private RecyclerView recyclerView;
-    private ListFragmentPresenter listFragmentPresenter;
+
+    @Inject
+    ListFragmentPresenter listFragmentPresenter;
+
+
+    private GameComponent gameComponent;
+    private GameScreenComponent gameScreenComponent;
     private LinearLayoutManager layoutManager;
     private TypeWriter typeWriter;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
@@ -45,25 +60,39 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        listFragmentPresenter = new ListFragmentPresenter(this, new DataRepository());
-        listFragmentPresenter.onGameStart();
+
+        gameComponent = DaggerGameComponent.builder()
+                .appComponent(MyApp.getInstance().getAppComponent())
+                .gameStartModule(new GameStartModule())
+                .saveGameInteractorModule(new SaveGameInteractorModule())
+                .gameLoopInteractorModule(new GameLoopInteractorModule())
+                .build();
+        gameScreenComponent = DaggerGameScreenComponent.builder()
+                .gameComponent(gameComponent)
+                .build();
+        gameScreenComponent.inject(this);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.message_list_fragment, container, false);
-        recyclerView = v.findViewById(R.id.dialog_view);
-        layoutManager = new LinearLayoutManager(
-                requireContext(), RecyclerView.VERTICAL, false
-        );
-        typeWriter = v.findViewById(R.id.textView);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new MessageAppearItemAnimator());
-        initRecyclerListeners();
         return v;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        recyclerView = view.findViewById(R.id.dialog_view);
+        layoutManager = new LinearLayoutManager(
+                requireContext(), RecyclerView.VERTICAL, false
+        );
+        typeWriter = view.findViewById(R.id.textView);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new MessageAppearItemAnimator());
+        initRecyclerListeners();
+        listFragmentPresenter.attachView(this);
+        listFragmentPresenter.onGameStart();
+    }
 
     @Override
     public void showAnimation() {
@@ -136,11 +165,21 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         if (animator != null) {
             animator.end();
         }
+        listFragmentPresenter.save(messagesAdapter.getListObj());
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        listFragmentPresenter.saveOnDetachView(messagesAdapter.getListObj());
+    public void onDestroyView() {
+        super.onDestroyView();
+        listFragmentPresenter.clearDisposable();
+        listFragmentPresenter.detachView();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        gameComponent = null;
+        gameScreenComponent = null;
     }
 }

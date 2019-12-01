@@ -15,7 +15,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.R;
-import ru.niceaska.gameproject.data.repository.DataRepository;
 import ru.niceaska.gameproject.domain.FirstLoadDataInteractor;
 import ru.niceaska.gameproject.presentation.view.GameStartFragment;
 
@@ -27,10 +26,13 @@ public class StartAppPresenter {
     private static final String FILE_NAME = "scenario.json";
     private static final String TAG = StartAppPresenter.class.getName();
 
-    public StartAppPresenter(GameStartFragment gameStartFragmentWeakReference, DataRepository dataRepository) {
-        this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragmentWeakReference);
-        this.firstLoadDataInteractor = new FirstLoadDataInteractor(dataRepository);
+    public StartAppPresenter(FirstLoadDataInteractor interactor) {
+        this.firstLoadDataInteractor = interactor;
         this.compositeDisposable = new CompositeDisposable();
+    }
+
+    public void attachView(GameStartFragment gameStartFragment) {
+        this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragment);
     }
 
     public void loadData() {
@@ -67,4 +69,7 @@ public class StartAppPresenter {
         compositeDisposable.clear();
     }
 
+    public void detachView() {
+        gameStartFragmentWeakReference.clear();
+    }
 }

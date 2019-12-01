@@ -5,15 +5,14 @@ import java.util.List;
 
 import io.reactivex.Single;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.data.repository.DataRepository;
 import ru.niceaska.gameproject.domain.model.MessageChoices;
 import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class GameLoopInteractor {
 
-    private DataRepository dataRepository;
+    private IDataRepository dataRepository;
 
-    public GameLoopInteractor(DataRepository dataRepository) {
+    public GameLoopInteractor(IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 

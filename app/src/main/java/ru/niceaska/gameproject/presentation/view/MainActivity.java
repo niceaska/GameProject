@@ -68,5 +68,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     protected void onDestroy() {
         super.onDestroy();
         mainActivityPresenter.clearDisposable();
+
     }
 }

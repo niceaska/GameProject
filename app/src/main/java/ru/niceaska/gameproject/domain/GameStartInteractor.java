@@ -10,14 +10,14 @@ import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class GameStartInteractor {
 
-    private DataRepository dataRepository;
+    private IDataRepository dataRepository;
 
-    public GameStartInteractor(DataRepository dataRepository) {
+    public GameStartInteractor(IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 
     public Single<List<ListItem>> loadHistory() {
-        return dataRepository.loadHistory("1")
+        return dataRepository.loadHistory(DataRepository.USER_ID)
                 .map(historyMessages -> {
                     List<ListItem> messageList = new ArrayList<>(historyMessages);
                     if (!historyMessages.isEmpty()) {

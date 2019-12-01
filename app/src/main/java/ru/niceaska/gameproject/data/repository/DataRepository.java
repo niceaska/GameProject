@@ -17,9 +17,10 @@ import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
+import ru.niceaska.gameproject.domain.IDataRepository;
 import ru.niceaska.gameproject.domain.model.MessageItem;
 
-public class DataRepository {
+public class DataRepository implements IDataRepository {
 
     public static final String USER_ID = "1";
     public static final String USER_NAME = "test";
@@ -46,12 +47,14 @@ public class DataRepository {
     }
 
 
+    @Override
     public Completable saveUserData(int lastIndex, List<ListItem> messageItems) {
         UserPojo userPojo = new UserPojo(USER_ID, USER_NAME, lastIndex);
         User user = new User(userPojo, saveMessageConverter.convertToHistory(messageItems));
         return insertUserInformation(user);
     }
 
+    @Override
     public Single<List<ListItem>> loadNewGameMessage(int nextIndex, List<ListItem> listItems) {
         return getMessageById(nextIndex).map(gameMessage -> {
             List<ListItem> items = new ArrayList<>(listItems);
@@ -65,14 +68,17 @@ public class DataRepository {
         });
     }
 
+    @Override
     public Single<Integer> loadUserProgress(String userId) {
         return database.getUserDao().getuserProgress(userId);
     }
 
+    @Override
     public Single<Boolean> checkFirstStart(String userId) {
         return database.getUserDao().getUserById(userId).map(user -> user == null || user.savedMessages.isEmpty());
     }
 
+    @Override
     public Observable<Object> firstLoadData(Reader open) {
         User user = new User(new UserPojo(USER_ID, USER_NAME, 0), new ArrayList<HistoryMessage>());
         return Observable.fromCallable(() -> {
@@ -84,6 +90,7 @@ public class DataRepository {
                 .mergeWith(insertUserInformation(user));
     }
 
+    @Override
     public Single<List<MessageItem>> loadHistory(String userId) {
         return database.getUserDao().getUserById(userId).map(user -> messageConverter.convertFromHistory(user.savedMessages));
     }

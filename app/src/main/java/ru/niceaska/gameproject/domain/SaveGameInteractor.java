@@ -4,13 +4,12 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.data.repository.DataRepository;
 
 public class SaveGameInteractor {
 
-    private DataRepository dataRepository;
+    private IDataRepository dataRepository;
 
-    public SaveGameInteractor(DataRepository dataRepository) {
+    public SaveGameInteractor(IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 

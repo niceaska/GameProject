@@ -3,13 +3,12 @@ package ru.niceaska.gameproject.domain;
 import java.io.Reader;
 
 import io.reactivex.Observable;
-import ru.niceaska.gameproject.data.repository.DataRepository;
 
 public class FirstLoadDataInteractor {
 
-    private DataRepository dataRepository;
+    private IDataRepository dataRepository;
 
-    public FirstLoadDataInteractor(DataRepository dataRepository) {
+    public FirstLoadDataInteractor(IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 

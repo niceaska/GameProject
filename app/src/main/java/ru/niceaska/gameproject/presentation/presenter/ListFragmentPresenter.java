@@ -10,7 +10,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.data.repository.DataRepository;
 import ru.niceaska.gameproject.domain.GameLoopInteractor;
 import ru.niceaska.gameproject.domain.GameStartInteractor;
 import ru.niceaska.gameproject.domain.SaveGameInteractor;
@@ -34,15 +33,19 @@ public class ListFragmentPresenter {
     private GameLoopInteractor gameLoopInteractor;
     private SaveGameInteractor saveGameInteractor;
 
-    public ListFragmentPresenter(MessageListFragment messageListFragmentWeakReference,
-                                 DataRepository dataRepository) {
-        this.messageListFragmentWeakReference = new WeakReference<>(messageListFragmentWeakReference);
+    public ListFragmentPresenter(GameStartInteractor gameStartInteractor,
+                                 GameLoopInteractor gameLoopInteractor,
+                                 SaveGameInteractor saveGameInteractor) {
         this.compositeDisposable = new CompositeDisposable();
-        this.gameStartInteractor = new GameStartInteractor(dataRepository);
-        this.gameLoopInteractor = new GameLoopInteractor(dataRepository);
-        this.saveGameInteractor = new SaveGameInteractor(dataRepository);
+        this.gameStartInteractor = gameStartInteractor;
+        this.gameLoopInteractor = gameLoopInteractor;
+        this.saveGameInteractor = saveGameInteractor;
     }
 
+    public void attachView(MessageListFragment messageListFragment) {
+        this.messageListFragmentWeakReference = new WeakReference<>(messageListFragment);
+
+    }
 
     public void onGameStart() {
         compositeDisposable.add(gameStartInteractor.loadHistory()
@@ -153,26 +156,25 @@ public class ListFragmentPresenter {
         }
     }
 
-    public void saveOnDetachView(List<ListItem> itemList) {
+    public void save(List<ListItem> itemList) {
         compositeDisposable.add(saveGameInteractor.saveGame(lastIndex, itemList)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         () -> Log.d("SAVE", "saveOnDetachView: "),
                         throwable -> Log.d("SAVE", "saveOnDetachView: " + throwable.getMessage())
                 ));
-        detachView();
-        clearDisposable();
     }
 
     private void setLastIndex(int lastIndex) {
         this.lastIndex = lastIndex;
     }
 
-    private void detachView() {
+    public void detachView() {
+        clearDisposable();
         messageListFragmentWeakReference.clear();
     }
 
-    private void clearDisposable() {
+    public void clearDisposable() {
         compositeDisposable.clear();
     }
 
