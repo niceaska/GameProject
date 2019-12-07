@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Окна домов</string>
+    <string name="start_game">Начать игру</string>
+    <string name="printing">Печатает</string>
+    <string name="hero_name">Антон</string>
+    <string name="you">Вы</string>
+    <string name="error_data_loading">Ошибка загрузки данных</string>
+    <string name="notification_title">Антону нужна твоя помощь!</string>
+    <string name="help_hero">Помоги ему найти выход из сложной ситуации.</string>
+</resources>

@@ -1,0 +1,12 @@
+package ru.niceaska.gameproject.di.components;
+
+import dagger.Component;
+import ru.niceaska.gameproject.di.modules.FirstLoadModule;
+import ru.niceaska.gameproject.di.scopes.GameScope;
+import ru.niceaska.gameproject.domain.FirstLoadDataInteractor;
+
+@Component(dependencies = AppComponent.class, modules = {FirstLoadModule.class})
+@GameScope
+public interface FirstLoadComponent {
+    FirstLoadDataInteractor firstLoadDtatInteractor();
+}
