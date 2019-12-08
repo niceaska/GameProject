@@ -1,20 +1,12 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
-import android.app.Activity;
-import android.content.res.AssetManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.ref.WeakReference;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.domain.FirstLoadDataInteractor;
 import ru.niceaska.gameproject.presentation.view.GameStartFragment;
 
@@ -23,7 +15,6 @@ public class StartAppPresenter {
     private FirstLoadDataInteractor firstLoadDataInteractor;
     private CompositeDisposable compositeDisposable;
 
-    private static final String FILE_NAME = "scenario.json";
     private static final String TAG = StartAppPresenter.class.getName();
 
     public StartAppPresenter(FirstLoadDataInteractor interactor) {
@@ -35,33 +26,35 @@ public class StartAppPresenter {
         this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragment);
     }
 
+    public void createUser() {
+        compositeDisposable.add(
+                firstLoadDataInteractor.createUser().subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe()
+        );
+    }
+
     public void loadData() {
+        compositeDisposable.add(firstLoadDataInteractor.firstLoadData().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> showError())
+                .doOnComplete(() -> firstLoadDataInteractor.closeFile())
+                .subscribe(o -> {
+                        },
+                        throwable -> {
+                            Log.d(TAG, "loadData: " + throwable.getMessage());
+                        },
+                        () -> {
+                            createUser();
+                            if (gameStartFragmentWeakReference.get() != null) {
+                                gameStartFragmentWeakReference.get().beginNewGame();
+                            }
+                        }));
+    }
+
+    private void showError() {
         if (gameStartFragmentWeakReference.get() != null) {
-            Activity activity = gameStartFragmentWeakReference.get().getActivity();
-            if (activity != null) {
-                AssetManager assetManager = activity.getAssets();
-                try {
-                    InputStream is = assetManager.open(FILE_NAME);
-                    Reader open = new InputStreamReader(is);
-                    compositeDisposable.add(firstLoadDataInteractor.firstLoadData(open).subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(o -> {
-                                    },
-                                    throwable -> {
-                                        Toast.makeText(activity.getApplicationContext(),
-                                                activity.getResources().getString(R.string.error_data_loading),
-                                                Toast.LENGTH_LONG).show();
-                                        Log.d(TAG, "loadData: " + throwable.getMessage());
-                                        open.close();
-                                    },
-                                    () -> {
-                                        gameStartFragmentWeakReference.get().beginNewGame();
-                                        open.close();
-                                    }));
-                } catch (IOException e) {
-                    Log.d(TAG, "loadData: " + e.getMessage());
-                }
-            }
+            gameStartFragmentWeakReference.get().showErrorToast();
         }
     }
 

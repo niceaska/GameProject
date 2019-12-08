@@ -9,26 +9,35 @@ import androidx.work.WorkManager;
 
 import java.util.concurrent.TimeUnit;
 
+import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.R;
-import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.di.components.DaggerMainActivityComponent;
+import ru.niceaska.gameproject.di.components.MainActivityComponent;
+import ru.niceaska.gameproject.di.modules.MainActivityModule;
 import ru.niceaska.gameproject.presentation.presenter.MainActivityPresenter;
 
 public class MainActivity extends AppCompatActivity implements IMainActivity {
 
     private final static int NOTIFICATION_DELAY = 1;
 
-    private MainActivityPresenter mainActivityPresenter;
-    private DataRepository dataRepository;
+    MainActivityPresenter mainActivityPresenter;
+
+    private MainActivityComponent mainActivityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dataRepository = new DataRepository();
-        mainActivityPresenter = new MainActivityPresenter(this, dataRepository);
-        mainActivityPresenter.gameRun();
-
+        mainActivityComponent = DaggerMainActivityComponent.builder()
+                .appComponent(MyApp.getInstance().getAppComponent())
+                .mainActivityModule(new MainActivityModule())
+                .build();
+        mainActivityPresenter = mainActivityComponent.getMainActivityPresenter();
+        if (savedInstanceState == null) {
+            mainActivityPresenter.attachView(this);
+            mainActivityPresenter.gameRun();
+        }
 
     }
 
@@ -68,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     protected void onDestroy() {
         super.onDestroy();
         mainActivityPresenter.clearDisposable();
+        mainActivityPresenter.detachView();
+        mainActivityComponent = null;
 
     }
 }

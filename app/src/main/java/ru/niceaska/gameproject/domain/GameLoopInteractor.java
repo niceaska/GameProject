@@ -31,20 +31,11 @@ public class GameLoopInteractor {
     public List<ListItem> updateMessageList(MessageChoices messageChoices,
                                             List<ListItem> listItems, boolean isNegative) {
         final List<ListItem> newList = new ArrayList<ListItem>(listItems);
-        if (isNegative) {
-            newList.set(newList.size() - 1,
-                    new MessageItem(newList.size() - 1,
-                            messageChoices.getNegativeChoice(), true,
-                            messageChoices.getNegativeMessageAnswer(), null)
-            );
-        } else {
-            newList.set(newList.size() - 1,
-                    new MessageItem(newList.size() - 1,
-                            messageChoices.getPositiveChoice(), true,
-                            messageChoices.getPositiveMessageAnswer(), null)
-            );
-        }
+        int answer = isNegative ? messageChoices.getNegativeMessageAnswer() : messageChoices.getPositiveMessageAnswer();
+        newList.set(newList.size() - 1,
+                new MessageItem(newList.size() - 1,
+                        messageChoices.getNegativeChoice(), true,
+                        answer, null));
         return newList;
     }
-
 }

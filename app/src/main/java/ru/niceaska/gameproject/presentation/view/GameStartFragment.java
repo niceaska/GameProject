@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,7 +56,9 @@ public class GameStartFragment extends Fragment implements IGameStartFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         final Button startGame = view.findViewById(R.id.start_new_game);
-        startGame.setOnClickListener(v1 -> startAppPresenter.loadData());
+        startGame.setOnClickListener(v1 -> {
+            startAppPresenter.loadData();
+        });
     }
 
     @Override
@@ -82,5 +85,12 @@ public class GameStartFragment extends Fragment implements IGameStartFragment {
         super.onDetach();
         firstLoadComponent = null;
         flMscreenComponent = null;
+    }
+
+    @Override
+    public void showErrorToast() {
+        Toast.makeText(requireContext(),
+                getResources().getString(R.string.error_data_loading),
+                Toast.LENGTH_LONG).show();
     }
 }

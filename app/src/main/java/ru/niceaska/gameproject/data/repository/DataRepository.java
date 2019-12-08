@@ -1,9 +1,14 @@
 package ru.niceaska.gameproject.data.repository;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.Reader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +16,6 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.ListItem;
@@ -24,13 +28,19 @@ public class DataRepository implements IDataRepository {
 
     public static final String USER_ID = "1";
     public static final String USER_NAME = "test";
+    private static final String FILE_NAME = "scenario.json";
+
+
     private AppDatabase database;
+    private Context context;
     private MessageConverter messageConverter = new MessageConverter();
     private SaveMessageConverter saveMessageConverter = new SaveMessageConverter();
+    private InputStreamReader open;
 
 
-    public DataRepository() {
-        database = MyApp.getInstance().getDatabase();
+    public DataRepository(AppDatabase database, Context context) {
+        this.database = database;
+        this.context = context;
     }
 
     private Completable insertUserInformation(User user) {
@@ -79,15 +89,22 @@ public class DataRepository implements IDataRepository {
     }
 
     @Override
-    public Observable<Object> firstLoadData(Reader open) {
-        User user = new User(new UserPojo(USER_ID, USER_NAME, 0), new ArrayList<HistoryMessage>());
+    public Observable<List> firstLoadData() {
         return Observable.fromCallable(() -> {
+            AssetManager assetManager = context.getAssets();
+            InputStream is = assetManager.open(FILE_NAME);
+            open = new InputStreamReader(is);
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<GameMessage>>() {
             }.getType();
             return gson.<List<GameMessage>>fromJson(open, listType);
-        }).flatMap((gameMessages) -> insertMessages(gameMessages).toObservable())
-                .mergeWith(insertUserInformation(user));
+        }).flatMap((gameMessages) -> insertMessages(gameMessages).toObservable());
+    }
+
+    @Override
+    public Completable createUser() {
+        User user = new User(new UserPojo(USER_ID, USER_NAME, 0), new ArrayList<HistoryMessage>());
+        return insertUserInformation(user);
     }
 
     @Override
@@ -96,4 +113,14 @@ public class DataRepository implements IDataRepository {
     }
 
 
+    @Override
+    public void closeFile() {
+        if (open != null) {
+            try {
+                open.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -8,17 +8,21 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.domain.IDataRepository;
 import ru.niceaska.gameproject.presentation.view.IMainActivity;
 
 public class MainActivityPresenter {
 
     private WeakReference<IMainActivity> activityWeakReference;
-    private DataRepository dataRepository;
+    private IDataRepository dataRepository;
     private Disposable disposable;
 
-    public MainActivityPresenter(IMainActivity activity, DataRepository dataRepository) {
-        this.activityWeakReference = new WeakReference<IMainActivity>(activity);
+    public MainActivityPresenter(IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
+    }
+
+    public void attachView(IMainActivity activity) {
+        this.activityWeakReference = new WeakReference<IMainActivity>(activity);
     }
 
     public void gameRun() {
@@ -51,5 +55,9 @@ public class MainActivityPresenter {
 
     public void clearDisposable() {
         disposable.dispose();
+    }
+
+    public void detachView() {
+        activityWeakReference.clear();
     }
 }

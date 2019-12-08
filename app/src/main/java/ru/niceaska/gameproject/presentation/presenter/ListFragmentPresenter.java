@@ -18,12 +18,10 @@ import ru.niceaska.gameproject.presentation.view.MessageListFragment;
 
 public class ListFragmentPresenter {
 
-
     public enum Choice {
         NEGATIVE,
         POSITIVE
     }
-
 
     private int lastIndex;
     private List<ListItem> listItems;
@@ -51,15 +49,9 @@ public class ListFragmentPresenter {
         compositeDisposable.add(gameStartInteractor.loadHistory()
                 .map(messageList -> {
                     listItems = messageList;
-                    if (messageList.isEmpty() || !(messageList.get(messageList.size() - 1) instanceof MessageChoices)) {
-                        compositeDisposable.add(gameStartInteractor.loadUserProgress()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(integer -> {
-                                    lastIndex = integer;
-                                    gameLoop(gameLoopInteractor.getNextIndex(listItems));
-                                }, throwable -> {
-                                }));
+                    if (messageList.isEmpty() ||
+                            !(messageList.get(messageList.size() - 1) instanceof MessageChoices)) {
+                        runGameLoop();
                     }
                     return messageList;
                 })
@@ -68,6 +60,17 @@ public class ListFragmentPresenter {
                 .subscribe(this::updateMessages, throwable -> {
                 }));
 
+    }
+
+    private void runGameLoop() {
+        compositeDisposable.add(gameStartInteractor.loadUserProgress()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(integer -> {
+                    lastIndex = integer;
+                    gameLoop(gameLoopInteractor.getNextIndex(listItems));
+                }, throwable -> {
+                }));
     }
 
     private void updateMessages(List<ListItem> historyMessages) {
@@ -133,25 +136,31 @@ public class ListFragmentPresenter {
 
 
     private void positiveChoiceCallback(List<ListItem> listItems) {
-        if (!listItems.isEmpty()) {
-            final Object item = listItems.get(listItems.size() - 1);
-            if (item instanceof MessageChoices) {
-                List<ListItem> newList = gameLoopInteractor.updateMessageList((MessageChoices) item, listItems, false);
-                messageListFragmentWeakReference.get().updateMessageList(newList);
-                this.listItems = newList;
-                gameLoop(((MessageChoices) item).getPositiveMessageAnswer());
+        if (messageListFragmentWeakReference.get() != null) {
+            if (!listItems.isEmpty()) {
+                final Object item = listItems.get(listItems.size() - 1);
+                if (item instanceof MessageChoices) {
+                    List<ListItem> newList = gameLoopInteractor.updateMessageList((MessageChoices) item,
+                            listItems, false);
+                    messageListFragmentWeakReference.get().updateMessageList(newList);
+                    this.listItems = newList;
+                    gameLoop(((MessageChoices) item).getPositiveMessageAnswer());
+                }
             }
         }
     }
 
     private void negativeChoiceCallback(List<ListItem> listItems) {
-        if (!listItems.isEmpty()) {
-            final Object item = listItems.get(listItems.size() - 1);
-            if (item instanceof MessageChoices) {
-                List<ListItem> newList = gameLoopInteractor.updateMessageList((MessageChoices) item, listItems, true);
-                messageListFragmentWeakReference.get().updateMessageList(newList);
-                this.listItems = newList;
-                gameLoop(((MessageChoices) item).getNegativeMessageAnswer());
+        if (messageListFragmentWeakReference.get() != null) {
+            if (!listItems.isEmpty()) {
+                final Object item = listItems.get(listItems.size() - 1);
+                if (item instanceof MessageChoices) {
+                    List<ListItem> newList = gameLoopInteractor.updateMessageList((MessageChoices) item,
+                            listItems, true);
+                    messageListFragmentWeakReference.get().updateMessageList(newList);
+                    this.listItems = newList;
+                    gameLoop(((MessageChoices) item).getNegativeMessageAnswer());
+                }
             }
         }
     }

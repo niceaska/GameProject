@@ -19,7 +19,6 @@ public class GameMessage {
     @ColumnInfo(name = "message")
     private String message;
 
-
     @ColumnInfo(name = "is_gamer")
     private boolean isGamer;
 
@@ -27,11 +26,9 @@ public class GameMessage {
     @ColumnInfo(name = "next_message")
     private int nextMessage;
 
-
     @SerializedName("choices")
     @Embedded
     private Choices choices;
-
 
     public GameMessage(int id, String message, boolean isGamer, int nextMessage, Choices choices) {
         this.id = id;
@@ -45,11 +42,9 @@ public class GameMessage {
         return message;
     }
 
-
     public boolean isGamer() {
         return isGamer;
     }
-
 
     public Choices getChoices() {
         return choices;

@@ -12,7 +12,8 @@ import ru.niceaska.gameproject.domain.IDataRepository;
 @Singleton
 @Component(modules = {AppModule.class, DataModule.class})
 public interface AppComponent {
-    SharedPreferences sharedPreferences();
+    SharedPreferences getSharedPreferences();
 
-    IDataRepository iDataRepository();
+    IDataRepository getiDataRepository();
+
 }

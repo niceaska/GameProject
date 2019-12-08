@@ -1,7 +1,8 @@
 package ru.niceaska.gameproject.domain;
 
-import java.io.Reader;
+import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class FirstLoadDataInteractor {
@@ -12,8 +13,16 @@ public class FirstLoadDataInteractor {
         this.dataRepository = dataRepository;
     }
 
-    public Observable<Object> firstLoadData(Reader open) {
-        return dataRepository.firstLoadData(open);
+    public Observable<List> firstLoadData() {
+        return dataRepository.firstLoadData();
+    }
+
+    public Completable createUser() {
+        return dataRepository.createUser();
+    }
+
+    public void closeFile() {
+        dataRepository.closeFile();
     }
 }
 

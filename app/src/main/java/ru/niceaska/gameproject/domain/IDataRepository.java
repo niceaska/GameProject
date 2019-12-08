@@ -1,6 +1,5 @@
 package ru.niceaska.gameproject.domain;
 
-import java.io.Reader;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -18,7 +17,11 @@ public interface IDataRepository {
 
     Single<Boolean> checkFirstStart(String userId);
 
-    Observable<Object> firstLoadData(Reader open);
+    Observable<List> firstLoadData();
 
     Single<List<MessageItem>> loadHistory(String userId);
+
+    Completable createUser();
+
+    void closeFile();
 }
