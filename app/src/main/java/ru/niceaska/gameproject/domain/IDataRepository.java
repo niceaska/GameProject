@@ -15,7 +15,7 @@ public interface IDataRepository {
 
     Single<Integer> loadUserProgress(String userId);
 
-    Single<Boolean> checkFirstStart(String userId);
+    Single<Boolean> checkFirstStart();
 
     Observable<List> firstLoadData();
 
@@ -24,4 +24,8 @@ public interface IDataRepository {
     Completable createUser();
 
     void closeFile();
+
+    Completable refreshDatabase();
+
+    boolean isNotificationEnabled();
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string translatable="false" name="pref_notification_key">Notifications</string>
+    <string translatable="false" name="pref_enable_anim_key">animation</string>
+</resources>

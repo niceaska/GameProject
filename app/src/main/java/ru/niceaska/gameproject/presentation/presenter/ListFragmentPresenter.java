@@ -10,11 +10,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.data.model.ListItem;
-import ru.niceaska.gameproject.domain.GameLoopInteractor;
-import ru.niceaska.gameproject.domain.GameStartInteractor;
-import ru.niceaska.gameproject.domain.SaveGameInteractor;
+import ru.niceaska.gameproject.domain.interactors.GameLoopInteractor;
+import ru.niceaska.gameproject.domain.interactors.GameStartInteractor;
+import ru.niceaska.gameproject.domain.interactors.SaveGameInteractor;
 import ru.niceaska.gameproject.domain.model.MessageChoices;
-import ru.niceaska.gameproject.presentation.view.MessageListFragment;
+import ru.niceaska.gameproject.presentation.view.fragments.MessageListFragment;
 
 public class ListFragmentPresenter {
 

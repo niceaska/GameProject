@@ -3,10 +3,10 @@ package ru.niceaska.gameproject.di.components;
 import dagger.Component;
 import ru.niceaska.gameproject.di.modules.MainActivityModule;
 import ru.niceaska.gameproject.di.scopes.ScreenScope;
-import ru.niceaska.gameproject.presentation.presenter.MainActivityPresenter;
+import ru.niceaska.gameproject.presentation.view.activities.MainActivity;
 
-@Component(dependencies = AppComponent.class, modules = {MainActivityModule.class})
+@Component(dependencies = MainActivityInteractorComponent.class, modules = {MainActivityModule.class})
 @ScreenScope
 public interface MainActivityComponent {
-    MainActivityPresenter getMainActivityPresenter();
+    void inject(MainActivity mainActivity);
 }

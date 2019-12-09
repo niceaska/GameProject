@@ -7,10 +7,11 @@ import java.lang.ref.WeakReference;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.niceaska.gameproject.domain.FirstLoadDataInteractor;
-import ru.niceaska.gameproject.presentation.view.GameStartFragment;
+import ru.niceaska.gameproject.domain.interactors.FirstLoadDataInteractor;
+import ru.niceaska.gameproject.presentation.view.fragments.GameStartFragment;
 
 public class StartAppPresenter {
+
     private WeakReference<GameStartFragment> gameStartFragmentWeakReference;
     private FirstLoadDataInteractor firstLoadDataInteractor;
     private CompositeDisposable compositeDisposable;

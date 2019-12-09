@@ -14,11 +14,12 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import ru.niceaska.gameproject.R;
+import ru.niceaska.gameproject.presentation.view.activities.MainActivity;
 
 public class NotificationWorker extends Worker {
 
-    static final String PLAYER_AWAY_TEXT = "longAwayText";
-    static final String PLAYER_AWAY_TITLE = "longAwayTitle";
+    public static final String PLAYER_AWAY_TEXT = "longAwayText";
+    public static final String PLAYER_AWAY_TITLE = "longAwayTitle";
     private final String CHANNEL_ID = "1";
     private final int NOTIFICATION_ID = 1;
 

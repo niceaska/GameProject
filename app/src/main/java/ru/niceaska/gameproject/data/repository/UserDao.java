@@ -33,4 +33,7 @@ public abstract class UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract long insertMessage(HistoryMessage gameMessage);
+
+    @Query("DELETE FROM UserPojo")
+    public abstract void delete();
 }

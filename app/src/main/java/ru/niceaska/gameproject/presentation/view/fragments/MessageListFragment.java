@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject.presentation.view;
+package ru.niceaska.gameproject.presentation.view.fragments;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -28,6 +28,11 @@ import ru.niceaska.gameproject.di.modules.GameLoopInteractorModule;
 import ru.niceaska.gameproject.di.modules.GameStartModule;
 import ru.niceaska.gameproject.di.modules.SaveGameInteractorModule;
 import ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter;
+import ru.niceaska.gameproject.presentation.view.ChoiceButtonsHolder;
+import ru.niceaska.gameproject.presentation.view.IMessageListFragment;
+import ru.niceaska.gameproject.presentation.view.MessageAppearItemAnimator;
+import ru.niceaska.gameproject.presentation.view.MessagesAdapter;
+import ru.niceaska.gameproject.presentation.view.TypeWriter;
 
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.NEGATIVE;
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.POSITIVE;

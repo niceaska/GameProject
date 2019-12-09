@@ -5,6 +5,7 @@ public interface IMainActivity {
     void showStartAppFragment();
     void startGame();
 
+    void clearNotifications();
     void planningNotification();
 
 }

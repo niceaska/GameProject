@@ -12,14 +12,14 @@ public class MessageAppearItemAnimator extends DefaultItemAnimator {
     public boolean animateAdd(RecyclerView.ViewHolder holder) {
         if (holder instanceof MessagesAdapter.MessageViewHolder) {
             ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(holder.itemView, "alpha", 0f, 1f);
-            alphaAnimator.setDuration(1500);
+            alphaAnimator.setDuration(1000);
             alphaAnimator.setInterpolator(new AccelerateInterpolator());
             alphaAnimator.start();
             return true;
         } else if (holder instanceof MessagesAdapter.ButtonChoicesViewHolder) {
             holder.itemView.setTranslationX(-1200f);
             ObjectAnimator translationX = ObjectAnimator.ofFloat(holder.itemView, "translationX", -1200f, 0f);
-            translationX.setDuration(1500);
+            translationX.setDuration(1000);
             translationX.setInterpolator(new AccelerateInterpolator());
             translationX.start();
             return true;

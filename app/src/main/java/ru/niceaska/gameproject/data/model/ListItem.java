@@ -1,4 +1,4 @@
 package ru.niceaska.gameproject.data.model;
 
-public abstract class ListItem {
+public interface ListItem {
 }

@@ -1,10 +1,11 @@
-package ru.niceaska.gameproject.domain;
+package ru.niceaska.gameproject.domain.interactors;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
 import ru.niceaska.gameproject.data.model.ListItem;
+import ru.niceaska.gameproject.domain.IDataRepository;
 import ru.niceaska.gameproject.domain.model.MessageChoices;
 import ru.niceaska.gameproject.domain.model.MessageItem;
 
@@ -34,8 +35,8 @@ public class GameLoopInteractor {
         int answer = isNegative ? messageChoices.getNegativeMessageAnswer() : messageChoices.getPositiveMessageAnswer();
         newList.set(newList.size() - 1,
                 new MessageItem(newList.size() - 1,
-                        messageChoices.getNegativeChoice(), true,
-                        answer, null));
+                        isNegative ? messageChoices.getNegativeChoice() : messageChoices.getPositiveChoice(),
+                        true, answer, null));
         return newList;
     }
 }

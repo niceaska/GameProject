@@ -2,7 +2,7 @@ package ru.niceaska.gameproject.domain.model;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
-public class MessageChoices extends ListItem {
+public class MessageChoices implements ListItem {
     private String postiveChoiceLabel;
     private String negativeChoiceLabel;
     private String positiveChoice;

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/game_backgroud"
-    tools:context=".presentation.view.MainActivity">
+    android:background="@drawable/game_background"
+    tools:context=".presentation.view.activities.MainActivity">
 
     <FrameLayout
         android:id="@+id/list_fragment"

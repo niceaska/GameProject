@@ -5,20 +5,19 @@ import androidx.room.EmptyResultSetException;
 import java.lang.ref.WeakReference;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.niceaska.gameproject.data.repository.DataRepository;
-import ru.niceaska.gameproject.domain.IDataRepository;
+import ru.niceaska.gameproject.domain.interactors.MainActivityInteractor;
 import ru.niceaska.gameproject.presentation.view.IMainActivity;
 
 public class MainActivityPresenter {
 
     private WeakReference<IMainActivity> activityWeakReference;
-    private IDataRepository dataRepository;
-    private Disposable disposable;
+    private MainActivityInteractor activityInteracator;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public MainActivityPresenter(IDataRepository dataRepository) {
-        this.dataRepository = dataRepository;
+    public MainActivityPresenter(MainActivityInteractor interacator) {
+        this.activityInteracator = interacator;
     }
 
     public void attachView(IMainActivity activity) {
@@ -27,7 +26,7 @@ public class MainActivityPresenter {
 
     public void gameRun() {
         planNotification();
-        disposable = dataRepository.checkFirstStart(DataRepository.USER_ID).subscribeOn(Schedulers.io())
+        compositeDisposable.add(activityInteracator.checkFirstStart().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aBoolean -> {
                     if (activityWeakReference.get() != null) {
@@ -39,22 +38,39 @@ public class MainActivityPresenter {
                     }
                 }, throwable -> {
                     if (throwable instanceof EmptyResultSetException) {
-                        if (activityWeakReference.get() != null) {
-                            activityWeakReference.get().showStartAppFragment();
-                        }
+                        showGameStart();
                     }
-                });
+                }));
+    }
+
+    private void showGameStart() {
+        if (activityWeakReference.get() != null) {
+            activityWeakReference.get().showStartAppFragment();
+        }
+    }
+
+    public void restartGame() {
+        compositeDisposable.add(activityInteracator.refreshData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> gameRun())
+        );
     }
 
     private void planNotification() {
         IMainActivity activity = activityWeakReference.get();
         if (activity != null) {
-            activity.planningNotification();
+            activity.clearNotifications();
+            if (activityInteracator.isNotificationOn()) {
+                activity.planningNotification();
+            }
         }
     }
 
     public void clearDisposable() {
-        disposable.dispose();
+        if (compositeDisposable != null) {
+            compositeDisposable.clear();
+        }
     }
 
     public void detachView() {

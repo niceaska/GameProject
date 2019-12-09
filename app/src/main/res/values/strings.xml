@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">Окна домов</string>
-    <string name="start_game">Начать игру</string>
+    <string name="start_game">Новая игра</string>
     <string name="printing">Печатает</string>
-    <string name="hero_name">Антон</string>
-    <string name="you">Вы</string>
     <string name="error_data_loading">Ошибка загрузки данных</string>
     <string name="notification_title">Антону нужна твоя помощь!</string>
-    <string name="help_hero">Помоги ему найти выход из сложной ситуации.</string>
+    <string name="help_hero">Он ждет твоего ответа!</string>
+    <string name="resume_game">Возобновить</string>
+    <string name="settings">Настройки</string>
+    <string name="exit">Выход</string>
+    <string name="pref_notification_title">Включить уведомления</string>
+    <string name="pref_animation_title">Анимация</string>
 </resources>

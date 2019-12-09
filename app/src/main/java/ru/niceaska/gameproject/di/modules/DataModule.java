@@ -1,6 +1,7 @@
 package ru.niceaska.gameproject.di.modules;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import javax.inject.Singleton;
 
@@ -15,7 +16,9 @@ public class DataModule {
 
     @Provides
     @Singleton
-    public IDataRepository getRepository(AppDatabase database, Context context) {
-        return new DataRepository(database, context);
+    public IDataRepository getRepository(AppDatabase database,
+                                         Context context,
+                                         SharedPreferences preferences) {
+        return new DataRepository(database, context, preferences);
     }
 }

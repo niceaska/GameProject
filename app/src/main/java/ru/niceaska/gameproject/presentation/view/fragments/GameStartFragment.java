@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject.presentation.view;
+package ru.niceaska.gameproject.presentation.view.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -22,6 +22,8 @@ import ru.niceaska.gameproject.di.components.FLMscreenComponent;
 import ru.niceaska.gameproject.di.components.FirstLoadComponent;
 import ru.niceaska.gameproject.di.modules.FirstLoadModule;
 import ru.niceaska.gameproject.presentation.presenter.StartAppPresenter;
+import ru.niceaska.gameproject.presentation.view.IGameStartFragment;
+import ru.niceaska.gameproject.presentation.view.IMainActivity;
 
 public class GameStartFragment extends Fragment implements IGameStartFragment {
 
@@ -30,6 +32,7 @@ public class GameStartFragment extends Fragment implements IGameStartFragment {
 
     private FirstLoadComponent firstLoadComponent;
     private FLMscreenComponent flMscreenComponent;
+
 
     @Override
     public void onAttach(@NonNull Context context) {

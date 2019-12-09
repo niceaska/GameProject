@@ -2,7 +2,7 @@ package ru.niceaska.gameproject.domain.model;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
-public class MessageItem extends ListItem {
+public class MessageItem implements ListItem {
 
     private int id;
     private String message;

@@ -5,4 +5,5 @@
     <color name="colorAccent">#D81B60</color>
     <color name="toolbarColor">#222</color>
     <color name="statusBarColor">#211222</color>
+    <color name="prefBackground">@android:color/darker_gray</color>
 </resources>

@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject.domain;
+package ru.niceaska.gameproject.domain.interactors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import io.reactivex.Single;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.data.repository.DataRepository;
+import ru.niceaska.gameproject.domain.IDataRepository;
 import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class GameStartInteractor {

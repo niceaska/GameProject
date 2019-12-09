@@ -1,6 +1,7 @@
 package ru.niceaska.gameproject.data.repository;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 
 import com.google.gson.Gson;
@@ -16,6 +17,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.data.model.GameMessage;
 import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.ListItem;
@@ -36,11 +38,15 @@ public class DataRepository implements IDataRepository {
     private MessageConverter messageConverter = new MessageConverter();
     private SaveMessageConverter saveMessageConverter = new SaveMessageConverter();
     private InputStreamReader open;
+    private SharedPreferences preferences;
 
 
-    public DataRepository(AppDatabase database, Context context) {
+    public DataRepository(AppDatabase database,
+                          Context context,
+                          SharedPreferences preferences) {
         this.database = database;
         this.context = context;
+        this.preferences = preferences;
     }
 
     private Completable insertUserInformation(User user) {
@@ -84,8 +90,9 @@ public class DataRepository implements IDataRepository {
     }
 
     @Override
-    public Single<Boolean> checkFirstStart(String userId) {
-        return database.getUserDao().getUserById(userId).map(user -> user == null || user.savedMessages.isEmpty());
+    public Single<Boolean> checkFirstStart() {
+        return database.getUserDao().getUserById(USER_ID)
+                .map(user -> user == null || user.savedMessages.isEmpty());
     }
 
     @Override
@@ -109,7 +116,8 @@ public class DataRepository implements IDataRepository {
 
     @Override
     public Single<List<MessageItem>> loadHistory(String userId) {
-        return database.getUserDao().getUserById(userId).map(user -> messageConverter.convertFromHistory(user.savedMessages));
+        return database.getUserDao().getUserById(userId)
+                .map(user -> messageConverter.convertFromHistory(user.savedMessages));
     }
 
 
@@ -122,5 +130,17 @@ public class DataRepository implements IDataRepository {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public Completable refreshDatabase() {
+        return Completable.fromAction(() -> database.getUserDao().delete());
+    }
+
+    @Override
+    public boolean isNotificationEnabled() {
+        return preferences.getBoolean(
+                context.getString(R.string.pref_notification_key), true
+        );
     }
 }

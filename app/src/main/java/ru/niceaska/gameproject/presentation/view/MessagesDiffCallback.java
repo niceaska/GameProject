@@ -35,14 +35,17 @@ public class MessagesDiffCallback extends DiffUtil.Callback {
         Object newItem = newList.get(newItemPosition);
         if (oldItem instanceof MessageItem && newItem instanceof MessageItem) {
             return ((MessageItem) oldItem).getId() == ((MessageItem) newItem).getId()
-                    && ((MessageItem) oldItem).isGamer() == ((MessageItem) newItem).isGamer();
+                    && ((MessageItem) oldItem).isGamer() == ((MessageItem) newItem).isGamer()
+                    && ((MessageItem) oldItem).getNextMessage() == ((MessageItem) newItem).getNextMessage();
         }
         return false;
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        Object oldItem = oldList.get(oldItemPosition);
+        Object newItem = newList.get(newItemPosition);
+        return oldItem.equals(newItem);
     }
 
 }
