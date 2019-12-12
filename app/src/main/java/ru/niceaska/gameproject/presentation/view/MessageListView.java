@@ -4,11 +4,13 @@ import java.util.List;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
-public interface IMessageListFragment {
+public interface MessageListView {
     void showAnimation();
     void showUserTyping();
     void hideUserTyping();
     void clearAnimation();
     void scrollToBottom();
+
+    void setUpdateAnimator(boolean isMesageAnimation);
     void updateMessageList(List<ListItem> newList);
 }

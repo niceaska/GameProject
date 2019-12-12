@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
-    <SwitchPreferenceCompat
-        app:defaultValue="true"
-        app:key="@string/pref_notification_key"
-        app:title="@string/pref_notification_title" />
-    <CheckBoxPreference
-        app:defaultValue="true"
-        app:key="@string/pref_enable_anim_key"
-        app:title="@string/pref_animation_title" />
+
+    <PreferenceCategory app:title="@string/pref_notification_category">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_notification_key"
+            app:title="@string/pref_notification_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/pref_ui_category">
+
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:key="@string/pref_enable_anim_key"
+            app:title="@string/pref_animation_title"
+            app:summary="@string/pref_enable_anim_caption" />
+
+    </PreferenceCategory>
+
+    <Preference
+        app:title="@string/pref_warning_title"
+        app:summary="@string/pref_warning_caption" />
 
 </PreferenceScreen>

@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <ru.niceaska.gameproject.presentation.view.TypeWriter
+    <ru.niceaska.gameproject.presentation.view.ui.TypeWriter
         android:id="@+id/textView"
         android:layout_gravity="center"
         android:textColor="@android:color/white"

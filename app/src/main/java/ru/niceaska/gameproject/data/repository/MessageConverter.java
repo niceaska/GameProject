@@ -9,8 +9,17 @@ import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.domain.model.MessageChoices;
 import ru.niceaska.gameproject.domain.model.MessageItem;
 
+/**
+ * Конвертер для domain слоя
+ */
 public class MessageConverter {
 
+    /**
+     * Конвертирует из истории в список для отображения
+     *
+     * @param historyMessageList спиок - история сообщений
+     * @return спиок сообщений для отображения
+     */
     public List<MessageItem> convertFromHistory(List<HistoryMessage> historyMessageList) {
         int i = 0;
         List<MessageItem> messageItems = new ArrayList<>();
@@ -37,7 +46,11 @@ public class MessageConverter {
         return messageItems;
     }
 
-
+    /**
+     * Конвертирует игровое сообщение - сущность дата слоя в сообщение для отображения
+     * @param gameMessage игшровое сообщение
+     * @return сообщение для отображения
+     */
     public MessageItem convertFromGameMessage(GameMessage gameMessage) {
         Choices choices = gameMessage.getChoices();
         MessageChoices messageChoices = null;

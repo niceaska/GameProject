@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject.presentation.view;
+package ru.niceaska.gameproject.presentation.view.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,11 @@ import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.domain.model.MessageChoices;
 import ru.niceaska.gameproject.domain.model.MessageItem;
+import ru.niceaska.gameproject.presentation.view.ChoiceButtonsHolder;
 
+/**
+ * Адаптер для списка сообщений
+ */
 public class MessagesAdapter extends RecyclerView.Adapter {
 
     private List<ListItem> listObj = new ArrayList<>();
@@ -39,7 +43,6 @@ public class MessagesAdapter extends RecyclerView.Adapter {
             throw new IllegalArgumentException();
         }
     }
-
 
     @NonNull
     @Override
@@ -99,9 +102,9 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     }
 
 
-    static class MessageViewHolder extends RecyclerView.ViewHolder {
+    public static class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        TextView messageText;
+        private TextView messageText;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -114,12 +117,11 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     }
 
 
+    public static class ButtonChoicesViewHolder extends RecyclerView.ViewHolder {
 
-    static class ButtonChoicesViewHolder extends RecyclerView.ViewHolder {
-
-        Button buttonLeft;
-        Button buttonRight;
-        ChoiceButtonsHolder listener;
+        private Button buttonLeft;
+        private Button buttonRight;
+        private ChoiceButtonsHolder listener;
 
         ButtonChoicesViewHolder(@NonNull View itemView, ChoiceButtonsHolder listener) {
             super(itemView);

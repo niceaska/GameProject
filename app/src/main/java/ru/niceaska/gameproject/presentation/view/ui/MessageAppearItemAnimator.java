@@ -1,10 +1,12 @@
-package ru.niceaska.gameproject.presentation.view;
+package ru.niceaska.gameproject.presentation.view.ui;
 
 import android.animation.ObjectAnimator;
 import android.view.animation.AccelerateInterpolator;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
+
+import ru.niceaska.gameproject.presentation.view.adapters.MessagesAdapter;
 
 public class MessageAppearItemAnimator extends DefaultItemAnimator {
 

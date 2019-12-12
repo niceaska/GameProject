@@ -5,6 +5,8 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.common.base.Objects;
+
 @Entity
 public class UserPojo {
 
@@ -26,10 +28,6 @@ public class UserPojo {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getName() {
         return name;
     }
@@ -42,7 +40,22 @@ public class UserPojo {
         return progress;
     }
 
-    public void setProgress(int progress) {
-        this.progress = progress;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserPojo userPojo = (UserPojo) o;
+        return progress == userPojo.progress &&
+                Objects.equal(userId, userPojo.userId) &&
+                Objects.equal(name, userPojo.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(userId, name, progress);
     }
 }

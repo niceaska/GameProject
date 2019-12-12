@@ -16,6 +16,9 @@ import androidx.work.WorkerParameters;
 import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.presentation.view.activities.MainActivity;
 
+/**
+ * Worker для отправки уведомления
+ */
 public class NotificationWorker extends Worker {
 
     public static final String PLAYER_AWAY_TEXT = "longAwayText";

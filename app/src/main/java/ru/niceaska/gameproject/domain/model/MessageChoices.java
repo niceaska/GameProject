@@ -1,8 +1,11 @@
 package ru.niceaska.gameproject.domain.model;
 
+import com.google.common.base.Objects;
+
 import ru.niceaska.gameproject.data.model.ListItem;
 
 public class MessageChoices implements ListItem {
+
     private String postiveChoiceLabel;
     private String negativeChoiceLabel;
     private String positiveChoice;
@@ -52,30 +55,24 @@ public class MessageChoices implements ListItem {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MessageChoices that = (MessageChoices) o;
-
-        if (positiveMessageAnswer != that.positiveMessageAnswer) return false;
-        if (negativeMessageAnswer != that.negativeMessageAnswer) return false;
-        if (postiveChoiceLabel != null ? !postiveChoiceLabel.equals(that.postiveChoiceLabel) : that.postiveChoiceLabel != null)
-            return false;
-        if (negativeChoiceLabel != null ? !negativeChoiceLabel.equals(that.negativeChoiceLabel) : that.negativeChoiceLabel != null)
-            return false;
-        if (positiveChoice != null ? !positiveChoice.equals(that.positiveChoice) : that.positiveChoice != null)
-            return false;
-        return negativeChoice != null ? negativeChoice.equals(that.negativeChoice) : that.negativeChoice == null;
+        return positiveMessageAnswer == that.positiveMessageAnswer &&
+                negativeMessageAnswer == that.negativeMessageAnswer &&
+                Objects.equal(postiveChoiceLabel, that.postiveChoiceLabel) &&
+                Objects.equal(negativeChoiceLabel, that.negativeChoiceLabel) &&
+                Objects.equal(positiveChoice, that.positiveChoice) &&
+                Objects.equal(negativeChoice, that.negativeChoice);
     }
 
     @Override
     public int hashCode() {
-        int result = postiveChoiceLabel != null ? postiveChoiceLabel.hashCode() : 0;
-        result = 31 * result + (negativeChoiceLabel != null ? negativeChoiceLabel.hashCode() : 0);
-        result = 31 * result + (positiveChoice != null ? positiveChoice.hashCode() : 0);
-        result = 31 * result + (negativeChoice != null ? negativeChoice.hashCode() : 0);
-        result = 31 * result + positiveMessageAnswer;
-        result = 31 * result + negativeMessageAnswer;
-        return result;
+        return Objects.hashCode(postiveChoiceLabel, negativeChoiceLabel,
+                positiveChoice, negativeChoice, positiveMessageAnswer, negativeMessageAnswer);
     }
 }

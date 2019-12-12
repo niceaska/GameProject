@@ -16,8 +16,6 @@ import ru.niceaska.gameproject.domain.interactors.SaveGameInteractor;
 @GameScope
 public interface GameComponent {
     GameLoopInteractor gameLoopInteractor();
-
     GameStartInteractor gameStartInteractor();
-
     SaveGameInteractor saveGaneInteractor();
 }

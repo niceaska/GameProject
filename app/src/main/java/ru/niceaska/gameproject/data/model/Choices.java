@@ -3,6 +3,8 @@ package ru.niceaska.gameproject.data.model;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
+import com.google.common.base.Objects;
+
 @Entity
 public class Choices {
 
@@ -62,30 +64,24 @@ public class Choices {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Choices choices = (Choices) o;
-
-        if (positiveMessageAnswer != choices.positiveMessageAnswer) return false;
-        if (negativeMessageAnswer != choices.negativeMessageAnswer) return false;
-        if (postiveChoiceLabel != null ? !postiveChoiceLabel.equals(choices.postiveChoiceLabel) : choices.postiveChoiceLabel != null)
-            return false;
-        if (negativeChoiceLabel != null ? !negativeChoiceLabel.equals(choices.negativeChoiceLabel) : choices.negativeChoiceLabel != null)
-            return false;
-        if (positiveChoice != null ? !positiveChoice.equals(choices.positiveChoice) : choices.positiveChoice != null)
-            return false;
-        return negativeChoice != null ? negativeChoice.equals(choices.negativeChoice) : choices.negativeChoice == null;
+        return positiveMessageAnswer == choices.positiveMessageAnswer &&
+                negativeMessageAnswer == choices.negativeMessageAnswer &&
+                Objects.equal(postiveChoiceLabel, choices.postiveChoiceLabel) &&
+                Objects.equal(negativeChoiceLabel, choices.negativeChoiceLabel) &&
+                Objects.equal(positiveChoice, choices.positiveChoice) &&
+                Objects.equal(negativeChoice, choices.negativeChoice);
     }
 
     @Override
     public int hashCode() {
-        int result = postiveChoiceLabel != null ? postiveChoiceLabel.hashCode() : 0;
-        result = 31 * result + (negativeChoiceLabel != null ? negativeChoiceLabel.hashCode() : 0);
-        result = 31 * result + (positiveChoice != null ? positiveChoice.hashCode() : 0);
-        result = 31 * result + (negativeChoice != null ? negativeChoice.hashCode() : 0);
-        result = 31 * result + positiveMessageAnswer;
-        result = 31 * result + negativeMessageAnswer;
-        return result;
+        return Objects.hashCode(postiveChoiceLabel, negativeChoiceLabel, positiveChoice,
+                negativeChoice, positiveMessageAnswer, negativeMessageAnswer);
     }
 }

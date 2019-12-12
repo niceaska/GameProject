@@ -5,6 +5,7 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.common.base.Objects;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -62,4 +63,24 @@ public class GameMessage {
         return nextMessage;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GameMessage that = (GameMessage) o;
+        return id == that.id &&
+                isGamer == that.isGamer &&
+                nextMessage == that.nextMessage &&
+                Objects.equal(message, that.message) &&
+                Objects.equal(choices, that.choices);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, message, isGamer, nextMessage, choices);
+    }
 }

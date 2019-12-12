@@ -8,6 +8,7 @@ import ru.niceaska.gameproject.presentation.presenter.StartAppPresenter;
 
 @Module
 public class FLMscreenModule {
+
     @ScreenScope
     @Provides
     public StartAppPresenter providesFirstLoadPresenter(FirstLoadDataInteractor interactor) {

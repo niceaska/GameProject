@@ -7,7 +7,6 @@ import android.content.res.AssetManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -28,7 +27,14 @@ import ru.niceaska.gameproject.domain.model.MessageItem;
 
 public class DataRepository implements IDataRepository {
 
+    /**
+     * id игрока
+     */
     public static final String USER_ID = "1";
+
+    /**
+     * имя игрока
+     */
     public static final String USER_NAME = "test";
     private static final String FILE_NAME = "scenario.json";
 
@@ -62,7 +68,13 @@ public class DataRepository implements IDataRepository {
                 .map(gameMessage -> messageConverter.convertFromGameMessage(gameMessage));
     }
 
-
+    /**
+     * Сохранить информацию о прогрессе игрока
+     *
+     * @param lastIndex    прогресс игрока
+     * @param messageItems сообщения которые будут добавлены в историю
+     * @return Completable совершенного действия
+     */
     @Override
     public Completable saveUserData(int lastIndex, List<ListItem> messageItems) {
         UserPojo userPojo = new UserPojo(USER_ID, USER_NAME, lastIndex);
@@ -70,6 +82,12 @@ public class DataRepository implements IDataRepository {
         return insertUserInformation(user);
     }
 
+    /**
+     * Загружает следующее сообщение и формирует список для отображения
+     * @param nextIndex индекс следующего сообщения
+     * @param listItems список сообщений
+     * @return сингл совершенного действия
+     */
     @Override
     public Single<List<ListItem>> loadNewGameMessage(int nextIndex, List<ListItem> listItems) {
         return getMessageById(nextIndex).map(gameMessage -> {
@@ -84,17 +102,30 @@ public class DataRepository implements IDataRepository {
         });
     }
 
+    /**
+     * Загружает прогресс игрока
+     * @param userId ид игрока
+     * @return сингл совершенного действия
+     */
     @Override
     public Single<Integer> loadUserProgress(String userId) {
         return database.getUserDao().getuserProgress(userId);
     }
 
+    /**
+     * Проверяет первый ли запуск приложения
+     * @return сингл проверки
+     */
     @Override
     public Single<Boolean> checkFirstStart() {
         return database.getUserDao().getUserById(USER_ID)
                 .map(user -> user == null || user.savedMessages.isEmpty());
     }
 
+    /**
+     * Загружает сценарий из ассетов и заполняет базу данных
+     * @return Observable
+     */
     @Override
     public Observable<List> firstLoadData() {
         return Observable.fromCallable(() -> {
@@ -105,42 +136,61 @@ public class DataRepository implements IDataRepository {
             Type listType = new TypeToken<ArrayList<GameMessage>>() {
             }.getType();
             return gson.<List<GameMessage>>fromJson(open, listType);
-        }).flatMap((gameMessages) -> insertMessages(gameMessages).toObservable());
+        }).doFinally(() -> open.close())
+                .flatMap((gameMessages) -> insertMessages(gameMessages).toObservable());
+
     }
 
+    /**
+     * Создает пользователя и загружает его в дб
+     * @return Completable
+     */
     @Override
     public Completable createUser() {
         User user = new User(new UserPojo(USER_ID, USER_NAME, 0), new ArrayList<HistoryMessage>());
         return insertUserInformation(user);
     }
 
+    /**
+     * Загружает историю сообщений игрока
+     * @param userId ид игрока
+     * @return сингл
+     */
     @Override
     public Single<List<MessageItem>> loadHistory(String userId) {
         return database.getUserDao().getUserById(userId)
                 .map(user -> messageConverter.convertFromHistory(user.savedMessages));
     }
 
-
-    @Override
-    public void closeFile() {
-        if (open != null) {
-            try {
-                open.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
+    /**
+     * Удаляет прогресс игрока при начале новой игры
+     * @return Completable
+     */
     @Override
     public Completable refreshDatabase() {
         return Completable.fromAction(() -> database.getUserDao().delete());
     }
 
+    /**
+     * Проверяет включены ли уведомления
+     * @return булевое значение - true включены, false нет
+     */
     @Override
     public boolean isNotificationEnabled() {
         return preferences.getBoolean(
                 context.getString(R.string.pref_notification_key), true
+        );
+    }
+
+    /**
+     * Проверяет включена ли анимация для сообщений
+     *
+     * @return булевое значение - true включена, false нет
+     */
+    @Override
+    public boolean isMessageAnimationEnabled() {
+        return preferences.getBoolean(
+                context.getString(R.string.pref_enable_anim_key), false
         );
     }
 }

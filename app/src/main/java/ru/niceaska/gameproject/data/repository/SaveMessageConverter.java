@@ -11,8 +11,17 @@ import ru.niceaska.gameproject.domain.model.MessageItem;
 
 import static ru.niceaska.gameproject.data.repository.DataRepository.USER_ID;
 
+/**
+ * Конвертер из домаин слоя в дата
+ */
 public class SaveMessageConverter {
 
+    /**
+     * Конвертирует из списка элементов для отображения в историю сообщений
+     *
+     * @param listItems спиок элементов ресайклера
+     * @return список - историю соообщений
+     */
     public List<HistoryMessage> convertToHistory(List<ListItem> listItems) {
         List<HistoryMessage> historyMessagesList = new ArrayList<>();
         for (int i = 0; i < listItems.size(); i++) {

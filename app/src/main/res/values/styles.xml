@@ -24,5 +24,16 @@
 
     </style>
 
+    <style name="text_message_body_style">
+        <item name="android:background">@drawable/messgae_gamer_drawable</item>
+        <item name="android:paddingTop">@dimen/dialog_padding_top</item>
+        <item name="android:paddingBottom">@dimen/dialog_padding_bottom</item>
+        <item name="android:paddingEnd">@dimen/dialog_padding_right</item>
+        <item name="android:paddingStart">@dimen/dialog_padding_left</item>
+        <item name="android:layout_marginTop">@dimen/dialog_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/dialog_margin_bottom</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 
 </resources>

@@ -3,6 +3,7 @@ package ru.niceaska.gameproject.di.modules;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
 import javax.inject.Singleton;
@@ -10,8 +11,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import ru.niceaska.gameproject.data.repository.AppDatabase;
-
-import static android.content.Context.MODE_PRIVATE;
 
 @Module
 public class AppModule {
@@ -27,7 +26,7 @@ public class AppModule {
     @Provides
     @Singleton
     public SharedPreferences getSharedPrefrence() {
-        return context.getSharedPreferences(GAME_PREFS, MODE_PRIVATE);
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Provides

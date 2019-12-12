@@ -9,5 +9,10 @@
     <string name="settings">Настройки</string>
     <string name="exit">Выход</string>
     <string name="pref_notification_title">Включить уведомления</string>
-    <string name="pref_animation_title">Анимация</string>
+    <string name="pref_animation_title">Анимация появления сообщений</string>
+    <string name="pref_enable_anim_caption">Показывать анимацию появления сообщений и кнопок</string>
+    <string name="pref_notification_category">Уведомления</string>
+    <string name="pref_ui_category">Внешний вид</string>
+    <string name="pref_warning_title">Внимание!</string>
+    <string name="pref_warning_caption">Для применения настроек необходимо перезагрузить игру</string>
 </resources>

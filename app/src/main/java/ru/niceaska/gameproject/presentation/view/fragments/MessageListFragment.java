@@ -2,6 +2,7 @@ package ru.niceaska.gameproject.presentation.view.fragments;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.R;
 import ru.niceaska.gameproject.data.model.ListItem;
+import ru.niceaska.gameproject.di.components.AppComponent;
 import ru.niceaska.gameproject.di.components.DaggerGameComponent;
 import ru.niceaska.gameproject.di.components.DaggerGameScreenComponent;
 import ru.niceaska.gameproject.di.components.GameComponent;
@@ -29,15 +31,15 @@ import ru.niceaska.gameproject.di.modules.GameStartModule;
 import ru.niceaska.gameproject.di.modules.SaveGameInteractorModule;
 import ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter;
 import ru.niceaska.gameproject.presentation.view.ChoiceButtonsHolder;
-import ru.niceaska.gameproject.presentation.view.IMessageListFragment;
-import ru.niceaska.gameproject.presentation.view.MessageAppearItemAnimator;
-import ru.niceaska.gameproject.presentation.view.MessagesAdapter;
-import ru.niceaska.gameproject.presentation.view.TypeWriter;
+import ru.niceaska.gameproject.presentation.view.MessageListView;
+import ru.niceaska.gameproject.presentation.view.adapters.MessagesAdapter;
+import ru.niceaska.gameproject.presentation.view.ui.MessageAppearItemAnimator;
+import ru.niceaska.gameproject.presentation.view.ui.TypeWriter;
 
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.NEGATIVE;
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.POSITIVE;
 
-public class MessageListFragment extends Fragment implements IMessageListFragment {
+public class MessageListFragment extends Fragment implements MessageListView {
 
     private final int ANIMATION_DURATION = 3000;
     private RecyclerView recyclerView;
@@ -47,6 +49,7 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
 
 
     private GameComponent gameComponent;
+    private AppComponent appComponent;
     private GameScreenComponent gameScreenComponent;
     private LinearLayoutManager layoutManager;
     private TypeWriter typeWriter;
@@ -66,8 +69,13 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getAppComponent();
+        injectDependencies();
+    }
+
+    private void injectDependencies() {
         gameComponent = DaggerGameComponent.builder()
-                .appComponent(MyApp.getInstance().getAppComponent())
+                .appComponent(appComponent)
                 .gameStartModule(new GameStartModule())
                 .saveGameInteractorModule(new SaveGameInteractorModule())
                 .gameLoopInteractorModule(new GameLoopInteractorModule())
@@ -76,6 +84,13 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
                 .gameComponent(gameComponent)
                 .build();
         gameScreenComponent.inject(this);
+    }
+
+    private void getAppComponent() {
+        Context applicationContext = requireContext().getApplicationContext();
+        if (applicationContext instanceof MyApp) {
+            appComponent = ((MyApp) applicationContext).getAppComponent();
+        }
     }
 
     @Nullable
@@ -93,7 +108,6 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         );
         typeWriter = view.findViewById(R.id.textView);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new MessageAppearItemAnimator());
         initRecyclerListeners();
         listFragmentPresenter.attachView(this);
         listFragmentPresenter.onGameStart();
@@ -139,6 +153,12 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         layoutManager.scrollToPosition(messagesAdapter.getItemCount() - 1);
     }
 
+    @Override
+    public void setUpdateAnimator(boolean isMessageAnimation) {
+        if (isMessageAnimation) {
+            recyclerView.setItemAnimator(new MessageAppearItemAnimator());
+        }
+    }
 
     private void initRecyclerListeners() {
         messagesAdapter.setListener(new ChoiceButtonsHolder() {
@@ -179,7 +199,6 @@ public class MessageListFragment extends Fragment implements IMessageListFragmen
         listFragmentPresenter.clearDisposable();
         listFragmentPresenter.detachView();
     }
-
 
     @Override
     public void onDestroy() {

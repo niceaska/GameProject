@@ -8,11 +8,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.domain.interactors.FirstLoadDataInteractor;
-import ru.niceaska.gameproject.presentation.view.fragments.GameStartFragment;
+import ru.niceaska.gameproject.presentation.view.GameStartView;
 
 public class StartAppPresenter {
 
-    private WeakReference<GameStartFragment> gameStartFragmentWeakReference;
+    private WeakReference<GameStartView> gameStartFragmentWeakReference;
     private FirstLoadDataInteractor firstLoadDataInteractor;
     private CompositeDisposable compositeDisposable;
 
@@ -23,11 +23,19 @@ public class StartAppPresenter {
         this.compositeDisposable = new CompositeDisposable();
     }
 
-    public void attachView(GameStartFragment gameStartFragment) {
+    /**
+     * Аттачит вью к презентеру
+     *
+     * @param gameStartFragment вью для презентера
+     */
+    public void attachView(GameStartView gameStartFragment) {
         this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragment);
     }
 
-    public void createUser() {
+    /**
+     * Создает нового юзера для хранения истории и прогресса
+     */
+    private void createUser() {
         compositeDisposable.add(
                 firstLoadDataInteractor.createUser().subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -35,11 +43,13 @@ public class StartAppPresenter {
         );
     }
 
+    /**
+     * Загружает и парсит данные из файла сценария
+     */
     public void loadData() {
         compositeDisposable.add(firstLoadDataInteractor.firstLoadData().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> showError())
-                .doOnComplete(() -> firstLoadDataInteractor.closeFile())
                 .subscribe(o -> {
                         },
                         throwable -> {
@@ -63,6 +73,9 @@ public class StartAppPresenter {
         compositeDisposable.clear();
     }
 
+    /**
+     * Деаттачит вью от презентера
+     */
     public void detachView() {
         gameStartFragmentWeakReference.clear();
     }

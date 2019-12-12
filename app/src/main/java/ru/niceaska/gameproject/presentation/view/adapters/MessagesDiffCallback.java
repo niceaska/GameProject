@@ -1,4 +1,4 @@
-package ru.niceaska.gameproject.presentation.view;
+package ru.niceaska.gameproject.presentation.view.adapters;
 
 import androidx.recyclerview.widget.DiffUtil;
 

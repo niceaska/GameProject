@@ -1,11 +1,13 @@
 package ru.niceaska.gameproject.presentation.view.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -16,6 +18,7 @@ import javax.inject.Inject;
 
 import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.R;
+import ru.niceaska.gameproject.di.components.AppComponent;
 import ru.niceaska.gameproject.di.components.DaggerMainActivityComponent;
 import ru.niceaska.gameproject.di.components.DaggerMainActivityInteractorComponent;
 import ru.niceaska.gameproject.di.components.MainActivityComponent;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     MainActivityPresenter mainActivityPresenter;
 
     private MainActivityInteractorComponent mainActivityInteractorComponent;
+    private AppComponent appComponent;
     private MainActivityComponent mainComponent;
     private WorkManager workManager;
 
@@ -43,18 +47,30 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mainActivityInteractorComponent = DaggerMainActivityInteractorComponent.builder()
-                .appComponent(MyApp.getInstance().getAppComponent())
-                .build();
-        mainComponent = DaggerMainActivityComponent.builder()
-                .mainActivityInteractorComponent(mainActivityInteractorComponent)
-                .build();
-        mainComponent.inject(this);
+        getAppComponent();
+        injectDependencies();
         mainActivityPresenter.attachView(this);
         if (savedInstanceState == null) {
             mainActivityPresenter.gameRun();
         }
 
+    }
+
+    private void injectDependencies() {
+        mainActivityInteractorComponent = DaggerMainActivityInteractorComponent.builder()
+                .appComponent(appComponent)
+                .build();
+        mainComponent = DaggerMainActivityComponent.builder()
+                .mainActivityInteractorComponent(mainActivityInteractorComponent)
+                .build();
+        mainComponent.inject(this);
+    }
+
+    private void getAppComponent() {
+        Context applicationContext = getApplicationContext();
+        if (applicationContext instanceof MyApp) {
+            appComponent = ((MyApp) applicationContext).getAppComponent();
+        }
     }
 
     @Override
@@ -83,12 +99,14 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     }
 
     private void showSettings() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .addToBackStack(null)
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .add(R.id.list_fragment, new GamePreferenceFragment())
-                .commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            fragmentManager.beginTransaction()
+                    .addToBackStack(null)
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .add(R.id.list_fragment, new GamePreferenceFragment())
+                    .commit();
+        }
     }
 
     @Override
@@ -128,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 .commit();
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -136,6 +153,5 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         mainActivityPresenter.detachView();
         mainComponent = null;
         mainActivityInteractorComponent = null;
-
     }
 }

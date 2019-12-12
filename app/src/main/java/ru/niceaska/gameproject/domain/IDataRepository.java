@@ -23,9 +23,10 @@ public interface IDataRepository {
 
     Completable createUser();
 
-    void closeFile();
 
     Completable refreshDatabase();
 
     boolean isNotificationEnabled();
+
+    boolean isMessageAnimationEnabled();
 }

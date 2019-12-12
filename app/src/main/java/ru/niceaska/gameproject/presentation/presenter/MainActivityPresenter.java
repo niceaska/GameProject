@@ -20,10 +20,18 @@ public class MainActivityPresenter {
         this.activityInteracator = interacator;
     }
 
+    /**
+     * Аттачит вью к презентеру
+     *
+     * @param activity вью для презентера
+     */
     public void attachView(IMainActivity activity) {
         this.activityWeakReference = new WeakReference<IMainActivity>(activity);
     }
 
+    /**
+     * Проверяет первый ли запуск игры и запускает соответствующий фрагмент
+     */
     public void gameRun() {
         planNotification();
         compositeDisposable.add(activityInteracator.checkFirstStart().subscribeOn(Schedulers.io())
@@ -49,6 +57,9 @@ public class MainActivityPresenter {
         }
     }
 
+    /**
+     * Запускает игру заново при выборе соответсвующего пункта меню
+     */
     public void restartGame() {
         compositeDisposable.add(activityInteracator.refreshData()
                 .subscribeOn(Schedulers.io())
@@ -73,6 +84,9 @@ public class MainActivityPresenter {
         }
     }
 
+    /**
+     * Деаттачит вью от презентера
+     */
     public void detachView() {
         activityWeakReference.clear();
     }

@@ -16,20 +16,22 @@ import javax.inject.Inject;
 
 import ru.niceaska.gameproject.MyApp;
 import ru.niceaska.gameproject.R;
+import ru.niceaska.gameproject.di.components.AppComponent;
 import ru.niceaska.gameproject.di.components.DaggerFLMscreenComponent;
 import ru.niceaska.gameproject.di.components.DaggerFirstLoadComponent;
 import ru.niceaska.gameproject.di.components.FLMscreenComponent;
 import ru.niceaska.gameproject.di.components.FirstLoadComponent;
 import ru.niceaska.gameproject.di.modules.FirstLoadModule;
 import ru.niceaska.gameproject.presentation.presenter.StartAppPresenter;
-import ru.niceaska.gameproject.presentation.view.IGameStartFragment;
+import ru.niceaska.gameproject.presentation.view.GameStartView;
 import ru.niceaska.gameproject.presentation.view.IMainActivity;
 
-public class GameStartFragment extends Fragment implements IGameStartFragment {
+public class GameStartFragment extends Fragment implements GameStartView {
 
     @Inject
     StartAppPresenter startAppPresenter;
 
+    private AppComponent appComponent;
     private FirstLoadComponent firstLoadComponent;
     private FLMscreenComponent flMscreenComponent;
 
@@ -37,8 +39,20 @@ public class GameStartFragment extends Fragment implements IGameStartFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        getAppComponent();
+        getDependencies();
+    }
+
+    private void getAppComponent() {
+        Context applicationContext = requireContext().getApplicationContext();
+        if (applicationContext instanceof MyApp) {
+            appComponent = ((MyApp) applicationContext).getAppComponent();
+        }
+    }
+
+    private void getDependencies() {
         firstLoadComponent = DaggerFirstLoadComponent.builder()
-                .appComponent(MyApp.getInstance().getAppComponent())
+                .appComponent(appComponent)
                 .firstLoadModule(new FirstLoadModule())
                 .build();
         flMscreenComponent = DaggerFLMscreenComponent.builder()
@@ -59,9 +73,7 @@ public class GameStartFragment extends Fragment implements IGameStartFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         final Button startGame = view.findViewById(R.id.start_new_game);
-        startGame.setOnClickListener(v1 -> {
-            startAppPresenter.loadData();
-        });
+        startGame.setOnClickListener(v1 -> startAppPresenter.loadData());
     }
 
     @Override

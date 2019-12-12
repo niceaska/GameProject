@@ -9,27 +9,18 @@ import ru.niceaska.gameproject.di.modules.DataModule;
 
 public class MyApp extends Application {
 
-    public static MyApp instance;
     private AppComponent appComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
         appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(instance))
+                .appModule(new AppModule(this))
                 .dataModule(new DataModule())
                 .build();
-
-
     }
 
     public AppComponent getAppComponent() {
         return appComponent;
     }
-
-    public static MyApp getInstance() {
-        return instance;
-    }
-
 }

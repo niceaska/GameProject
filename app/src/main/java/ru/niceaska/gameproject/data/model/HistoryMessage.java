@@ -7,6 +7,8 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 
+import com.google.common.base.Objects;
+
 
 @Entity(tableName = "history",
         foreignKeys = @ForeignKey(entity = UserPojo.class,
@@ -30,7 +32,6 @@ public class HistoryMessage {
     @Embedded
     private Choices choices;
 
-
     public HistoryMessage(@NonNull String id, @NonNull String user, String message,
                           boolean isGamer, int nextMessage, Choices choices) {
         this.id = id;
@@ -53,16 +54,13 @@ public class HistoryMessage {
         return user;
     }
 
-
     public String getMessage() {
         return message;
     }
 
-
     public boolean isGamer() {
         return isGamer;
     }
-
 
     public Choices getChoices() {
         return choices;
@@ -72,5 +70,25 @@ public class HistoryMessage {
         return nextMessage;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        HistoryMessage that = (HistoryMessage) o;
+        return isGamer == that.isGamer &&
+                nextMessage == that.nextMessage &&
+                Objects.equal(id, that.id) &&
+                Objects.equal(user, that.user) &&
+                Objects.equal(message, that.message) &&
+                Objects.equal(choices, that.choices);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, user, message, isGamer, nextMessage, choices);
+    }
 }
