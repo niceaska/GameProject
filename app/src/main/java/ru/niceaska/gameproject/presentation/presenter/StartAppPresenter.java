@@ -1,25 +1,24 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
-import android.util.Log;
-
 import java.lang.ref.WeakReference;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.domain.interactors.FirstLoadDataInteractor;
 import ru.niceaska.gameproject.presentation.view.GameStartView;
+import ru.niceaska.gameproject.rx.IRxSchedulers;
 
 public class StartAppPresenter {
 
     private WeakReference<GameStartView> gameStartFragmentWeakReference;
     private FirstLoadDataInteractor firstLoadDataInteractor;
     private CompositeDisposable compositeDisposable;
+    private IRxSchedulers rxSchedulers;
 
     private static final String TAG = StartAppPresenter.class.getName();
 
-    public StartAppPresenter(FirstLoadDataInteractor interactor) {
+    public StartAppPresenter(FirstLoadDataInteractor interactor, IRxSchedulers rxSchedulers) {
         this.firstLoadDataInteractor = interactor;
+        this.rxSchedulers = rxSchedulers;
         this.compositeDisposable = new CompositeDisposable();
     }
 
@@ -37,8 +36,8 @@ public class StartAppPresenter {
      */
     private void createUser() {
         compositeDisposable.add(
-                firstLoadDataInteractor.createUser().subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+                firstLoadDataInteractor.createUser().subscribeOn(rxSchedulers.getIoScheduler())
+                        .observeOn(rxSchedulers.getMainThreadScheduler())
                         .subscribe()
         );
     }
@@ -47,13 +46,12 @@ public class StartAppPresenter {
      * Загружает и парсит данные из файла сценария
      */
     public void loadData() {
-        compositeDisposable.add(firstLoadDataInteractor.firstLoadData().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        compositeDisposable.add(firstLoadDataInteractor.firstLoadData().subscribeOn(rxSchedulers.getIoScheduler())
+                .observeOn(rxSchedulers.getMainThreadScheduler())
                 .doOnError(throwable -> showError())
                 .subscribe(o -> {
                         },
                         throwable -> {
-                            Log.d(TAG, "loadData: " + throwable.getMessage());
                         },
                         () -> {
                             createUser();
@@ -70,7 +68,9 @@ public class StartAppPresenter {
     }
 
     public void unSubscribe() {
-        compositeDisposable.clear();
+        if (compositeDisposable != null) {
+            compositeDisposable.clear();
+        }
     }
 
     /**

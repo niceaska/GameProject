@@ -1,20 +1,17 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
-import android.util.Log;
-
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.domain.interactors.GameLoopInteractor;
 import ru.niceaska.gameproject.domain.interactors.GameStartInteractor;
 import ru.niceaska.gameproject.domain.interactors.SaveGameInteractor;
 import ru.niceaska.gameproject.domain.model.MessageChoices;
 import ru.niceaska.gameproject.presentation.view.MessageListView;
+import ru.niceaska.gameproject.rx.IRxSchedulers;
 
 public class ListFragmentPresenter {
 
@@ -33,10 +30,13 @@ public class ListFragmentPresenter {
     private GameStartInteractor gameStartInteractor;
     private GameLoopInteractor gameLoopInteractor;
     private SaveGameInteractor saveGameInteractor;
+    private IRxSchedulers rxSchedulers;
 
     public ListFragmentPresenter(GameStartInteractor gameStartInteractor,
                                  GameLoopInteractor gameLoopInteractor,
-                                 SaveGameInteractor saveGameInteractor) {
+                                 SaveGameInteractor saveGameInteractor,
+                                 IRxSchedulers rxSchedulers) {
+        this.rxSchedulers = rxSchedulers;
         this.compositeDisposable = new CompositeDisposable();
         this.gameStartInteractor = gameStartInteractor;
         this.gameLoopInteractor = gameLoopInteractor;
@@ -67,9 +67,9 @@ public class ListFragmentPresenter {
                     }
                     return messageList;
                 })
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(rxSchedulers.getIoScheduler())
                 .doOnSubscribe(disposable -> setMessagesAnimation())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(rxSchedulers.getMainThreadScheduler())
                 .subscribe(this::updateMessages, throwable -> {
                 })
         );
@@ -85,8 +85,8 @@ public class ListFragmentPresenter {
 
     private void runGameLoop() {
         compositeDisposable.add(gameStartInteractor.loadUserProgress()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(rxSchedulers.getIoScheduler())
+                .observeOn(rxSchedulers.getMainThreadScheduler())
                 .subscribe(integer -> {
                     lastIndex = integer;
                     gameLoop(gameLoopInteractor.getNextIndex(listItems));
@@ -107,9 +107,9 @@ public class ListFragmentPresenter {
      * @param nextIndex индекс следующего сообщения для загрузки
      */
     private void gameLoop(final int nextIndex) {
-        if (listItems != null && nextIndex < 9) {
+        if (listItems != null && nextIndex < 120) {
             compositeDisposable.add(gameLoopInteractor.loadNewMessage(nextIndex, listItems)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(rxSchedulers.getIoScheduler())
                     .doOnSubscribe(disposable -> {
                         MessageListView fragment = messageListFragmentWeakReference.get();
                         if (fragment != null) {
@@ -118,15 +118,14 @@ public class ListFragmentPresenter {
                         }
                     })
                     .delay(3, TimeUnit.SECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(rxSchedulers.getMainThreadScheduler())
                     .subscribe((items) -> {
                         MessageListView listFragment = messageListFragmentWeakReference.get();
                         listItems = items;
                         if (listFragment != null) {
                             listFragment.updateMessageList(items);
                             listFragment.scrollToBottom();
-                            listFragment.hideUserTyping();
-                            listFragment.clearAnimation();
+                            clearTypingAnimation();
                             setLastIndex(nextIndex);
                             if (!items.isEmpty()) {
                                 ListItem item = items.get(items.size() - 1);
@@ -134,7 +133,16 @@ public class ListFragmentPresenter {
                             }
                         }
                     }, throwable -> {
+                        clearTypingAnimation();
                     }));
+        }
+    }
+
+    private void clearTypingAnimation() {
+        MessageListView listView = messageListFragmentWeakReference.get();
+        if (listView != null) {
+            listView.hideUserTyping();
+            listView.clearAnimation();
         }
     }
 
@@ -197,11 +205,8 @@ public class ListFragmentPresenter {
      */
     public void save(List<ListItem> itemList) {
         compositeDisposable.add(saveGameInteractor.saveGame(lastIndex, itemList)
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        () -> Log.d("SAVE", "saveOnDetachView: "),
-                        throwable -> Log.d("SAVE", "saveOnDetachView: " + throwable.getMessage())
-                ));
+                .subscribeOn(rxSchedulers.getIoScheduler())
+                .subscribe());
     }
 
     private void setLastIndex(int lastIndex) {

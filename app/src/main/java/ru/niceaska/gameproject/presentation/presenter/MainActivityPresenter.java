@@ -1,23 +1,22 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
-import androidx.room.EmptyResultSetException;
-
 import java.lang.ref.WeakReference;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.domain.interactors.MainActivityInteractor;
 import ru.niceaska.gameproject.presentation.view.IMainActivity;
+import ru.niceaska.gameproject.rx.IRxSchedulers;
 
 public class MainActivityPresenter {
 
     private WeakReference<IMainActivity> activityWeakReference;
     private MainActivityInteractor activityInteracator;
+    private IRxSchedulers iRxSchedulers;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public MainActivityPresenter(MainActivityInteractor interacator) {
+    public MainActivityPresenter(MainActivityInteractor interacator, IRxSchedulers iRxSchedulers) {
         this.activityInteracator = interacator;
+        this.iRxSchedulers = iRxSchedulers;
     }
 
     /**
@@ -33,21 +32,19 @@ public class MainActivityPresenter {
      * Проверяет первый ли запуск игры и запускает соответствующий фрагмент
      */
     public void gameRun() {
-        planNotification();
-        compositeDisposable.add(activityInteracator.checkFirstStart().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        compositeDisposable.add(activityInteracator.checkFirstStart().subscribeOn(iRxSchedulers.getIoScheduler())
+                .observeOn(iRxSchedulers.getMainThreadScheduler())
+                .doOnSubscribe(disposable -> planNotification())
                 .subscribe(aBoolean -> {
                     if (activityWeakReference.get() != null) {
                         if (aBoolean) {
-                            activityWeakReference.get().showStartAppFragment();
+                            showGameStart();
                         } else {
                             activityWeakReference.get().startGame();
                         }
                     }
                 }, throwable -> {
-                    if (throwable instanceof EmptyResultSetException) {
-                        showGameStart();
-                    }
+                    showGameStart();
                 }));
     }
 
@@ -62,9 +59,9 @@ public class MainActivityPresenter {
      */
     public void restartGame() {
         compositeDisposable.add(activityInteracator.refreshData()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> gameRun())
+                .subscribeOn(iRxSchedulers.getIoScheduler())
+                .observeOn(iRxSchedulers.getMainThreadScheduler())
+                .subscribe(this::gameRun)
         );
     }
 

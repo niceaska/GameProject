@@ -63,9 +63,9 @@ public class DataRepository implements IDataRepository {
         return database.getGameMessgeDao().insertMessge(messageList);
     }
 
-    private Single<MessageItem> getMessageById(long id) {
-        return database.getGameMessgeDao().getById(id)
-                .map(gameMessage -> messageConverter.convertFromGameMessage(gameMessage));
+    private Single<GameMessage> getMessageById(long id) {
+        return database.getGameMessgeDao().getById(id);
+
     }
 
     /**
@@ -84,26 +84,30 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Загружает следующее сообщение и формирует список для отображения
+     *
      * @param nextIndex индекс следующего сообщения
      * @param listItems список сообщений
      * @return сингл совершенного действия
      */
     @Override
     public Single<List<ListItem>> loadNewGameMessage(int nextIndex, List<ListItem> listItems) {
-        return getMessageById(nextIndex).map(gameMessage -> {
-            List<ListItem> items = new ArrayList<>(listItems);
-            if (gameMessage != null) {
-                items.add(gameMessage);
-                if (gameMessage.getChoices() != null) {
-                    items.add(gameMessage.getChoices());
-                }
-            }
-            return items;
-        });
+        return getMessageById(nextIndex)
+                .map(gameMessage -> messageConverter.convertFromGameMessage(gameMessage))
+                .map(gameMessage -> {
+                    List<ListItem> items = new ArrayList<>(listItems);
+                    if (gameMessage != null) {
+                        items.add(gameMessage);
+                        if (gameMessage.getChoices() != null) {
+                            items.add(gameMessage.getChoices());
+                        }
+                    }
+                    return items;
+                });
     }
 
     /**
      * Загружает прогресс игрока
+     *
      * @param userId ид игрока
      * @return сингл совершенного действия
      */
@@ -114,6 +118,7 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Проверяет первый ли запуск приложения
+     *
      * @return сингл проверки
      */
     @Override
@@ -124,6 +129,7 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Загружает сценарий из ассетов и заполняет базу данных
+     *
      * @return Observable
      */
     @Override
@@ -143,6 +149,7 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Создает пользователя и загружает его в дб
+     *
      * @return Completable
      */
     @Override
@@ -153,6 +160,7 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Загружает историю сообщений игрока
+     *
      * @param userId ид игрока
      * @return сингл
      */
@@ -164,6 +172,7 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Удаляет прогресс игрока при начале новой игры
+     *
      * @return Completable
      */
     @Override
@@ -173,6 +182,7 @@ public class DataRepository implements IDataRepository {
 
     /**
      * Проверяет включены ли уведомления
+     *
      * @return булевое значение - true включены, false нет
      */
     @Override
@@ -190,7 +200,7 @@ public class DataRepository implements IDataRepository {
     @Override
     public boolean isMessageAnimationEnabled() {
         return preferences.getBoolean(
-                context.getString(R.string.pref_enable_anim_key), false
+                context.getString(R.string.pref_enable_anim_key), true
         );
     }
 }

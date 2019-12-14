@@ -15,7 +15,6 @@ import ru.niceaska.gameproject.data.repository.AppDatabase;
 @Module
 public class AppModule {
 
-    private static final String GAME_PREFS = "game_prefs";
     private static final String DATABASE = "database";
     private Context context;
 

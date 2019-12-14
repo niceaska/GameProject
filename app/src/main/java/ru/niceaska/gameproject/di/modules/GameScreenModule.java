@@ -7,14 +7,17 @@ import ru.niceaska.gameproject.domain.interactors.GameLoopInteractor;
 import ru.niceaska.gameproject.domain.interactors.GameStartInteractor;
 import ru.niceaska.gameproject.domain.interactors.SaveGameInteractor;
 import ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter;
+import ru.niceaska.gameproject.rx.IRxSchedulers;
 
 @Module
 public class GameScreenModule {
+
     @Provides
     @ScreenScope
     ListFragmentPresenter provideListFragmentPresenter(GameStartInteractor gameStartInteractor,
                                                        GameLoopInteractor gameLoopInteractor,
-                                                       SaveGameInteractor saveGameInteractor) {
-        return new ListFragmentPresenter(gameStartInteractor, gameLoopInteractor, saveGameInteractor);
+                                                       SaveGameInteractor saveGameInteractor,
+                                                       IRxSchedulers rxSchedulers) {
+        return new ListFragmentPresenter(gameStartInteractor, gameLoopInteractor, saveGameInteractor, rxSchedulers);
     }
 }
