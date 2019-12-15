@@ -64,7 +64,6 @@ public class ListFragmentPresenter {
     public void onGameStart() {
         compositeDisposable.add(gameStartInteractor.loadHistory()
                 .map(messageList -> {
-                    hideProgressBar();
                     listItems = messageList;
                     if (messageList.isEmpty() ||
                             !(messageList.get(messageList.size() - 1) instanceof MessageChoices)) {
@@ -82,13 +81,6 @@ public class ListFragmentPresenter {
                 })
         );
 
-    }
-
-    private void hideProgressBar() {
-        MessageListView listView = messageViewReference.get();
-        if (listView != null) {
-            listView.hideLoadingProgressBar();
-        }
     }
 
     private void showProgressBar() {
@@ -118,10 +110,11 @@ public class ListFragmentPresenter {
     }
 
     private void updateMessages(@NonNull List<ListItem> historyMessages) {
-        MessageListView fragment = messageViewReference.get();
-        if (fragment != null) {
-            fragment.updateMessageList(historyMessages);
-            fragment.scrollToBottom();
+        MessageListView listView = messageViewReference.get();
+        if (listView != null) {
+            listView.hideLoadingProgressBar();
+            listView.updateMessageList(historyMessages);
+            listView.scrollToBottom();
         }
     }
 
@@ -134,10 +127,11 @@ public class ListFragmentPresenter {
             compositeDisposable.add(gameLoopInteractor.loadNewMessage(nextIndex, listItems)
                     .subscribeOn(rxSchedulers.getIoScheduler())
                     .doOnSubscribe(disposable -> {
-                        MessageListView fragment = messageViewReference.get();
-                        if (fragment != null) {
-                            fragment.showUserTyping();
-                            fragment.showAnimation();
+                        MessageListView view = messageViewReference.get();
+                        if (view != null) {
+                            view.hideLoadingProgressBar();
+                            view.showUserTyping();
+                            view.showAnimation();
                         }
                     })
                     .delay(3, TimeUnit.SECONDS)

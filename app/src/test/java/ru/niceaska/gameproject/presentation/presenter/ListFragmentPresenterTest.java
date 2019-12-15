@@ -12,7 +12,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
@@ -78,6 +77,9 @@ public class ListFragmentPresenterTest {
         testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(true);
+        inOrder.verify(listView).showLoadingProgressBar();
+        inOrder.verify(listView).hideLoadingProgressBar();
+
         inOrder.verify(listView).updateMessageList(createMessageList(true));
         inOrder.verify(listView).scrollToBottom();
 
@@ -93,6 +95,8 @@ public class ListFragmentPresenterTest {
         testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(false);
+        inOrder.verify(listView).showLoadingProgressBar();
+        inOrder.verify(listView).hideLoadingProgressBar();
         inOrder.verify(listView).updateMessageList(createMessageList(true));
         inOrder.verify(listView).scrollToBottom();
 
@@ -110,6 +114,8 @@ public class ListFragmentPresenterTest {
         testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(false);
+        inOrder.verify(listView).showLoadingProgressBar();
+        inOrder.verify(listView).hideLoadingProgressBar();
         inOrder.verify(listView).showUserTyping();
         inOrder.verify(listView).showAnimation();
         testScheduler.advanceTimeBy(4, TimeUnit.SECONDS);
@@ -118,31 +124,6 @@ public class ListFragmentPresenterTest {
         inOrder.verify(listView).scrollToBottom();
         inOrder.verify(listView).hideUserTyping();
         inOrder.verify(listView).clearAnimation();
-    }
-
-    @Test
-    public void onGameStart_NoChoices_AnimationOff_Error() throws InterruptedException {
-        CountDownLatch lock = new CountDownLatch(1);
-        when(gameStartInteractor.loadHistory()).thenReturn(Single.just(createMessageList(false)));
-        when(gameStartInteractor.isMessageAnimationEnabled()).thenReturn(false);
-        when(gameStartInteractor.loadUserProgress()).thenReturn(Single.just(4));
-        when(gameLoopInteractor.loadNewMessage(Mockito.anyInt(), Mockito.anyList())).thenReturn(Single.error(new NullPointerException()));
-        when(gameLoopInteractor.getNextIndex(Mockito.anyList())).thenReturn(2);
-        presenter.onGameStart();
-        testScheduler.triggerActions();
-        InOrder inOrder = Mockito.inOrder(listView);
-        inOrder.verify(listView).setUpdateAnimator(false);
-        inOrder.verify(listView).showUserTyping();
-        inOrder.verify(listView).showAnimation();
-        testScheduler.advanceTimeBy(4, TimeUnit.SECONDS);
-        testScheduler.triggerActions();
-        verify(listView).updateMessageList(Mockito.anyList());
-        verify(listView).scrollToBottom();
-
-        verify(listView).hideUserTyping();
-        verify(listView).clearAnimation();
-
-        verifyNoMoreInteractions(listView);
     }
 
 
@@ -164,6 +145,7 @@ public class ListFragmentPresenterTest {
         presenter.changeListOnClick(ListFragmentPresenter.Choice.NEGATIVE, createMessageList(true));
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).updateMessageList(Mockito.anyList());
+        inOrder.verify(listView).hideLoadingProgressBar();
         inOrder.verify(listView).showUserTyping();
         inOrder.verify(listView).showAnimation();
         verifyNoMoreInteractions(listView);
@@ -177,7 +159,9 @@ public class ListFragmentPresenterTest {
                 .thenReturn(createMessageList(false));
         presenter.changeListOnClick(ListFragmentPresenter.Choice.POSITIVE, createMessageList(true));
         InOrder inOrder = Mockito.inOrder(listView);
+
         inOrder.verify(listView).updateMessageList(Mockito.anyList());
+        inOrder.verify(listView).hideLoadingProgressBar();
         inOrder.verify(listView).showUserTyping();
         inOrder.verify(listView).showAnimation();
         verifyNoMoreInteractions(listView);
