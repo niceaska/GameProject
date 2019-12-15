@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
+import androidx.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -14,7 +16,7 @@ public class MainActivityPresenter {
     private IRxSchedulers iRxSchedulers;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public MainActivityPresenter(MainActivityInteractor interacator, IRxSchedulers iRxSchedulers) {
+    public MainActivityPresenter(@NonNull MainActivityInteractor interacator, @NonNull IRxSchedulers iRxSchedulers) {
         this.activityInteracator = interacator;
         this.iRxSchedulers = iRxSchedulers;
     }
@@ -24,7 +26,7 @@ public class MainActivityPresenter {
      *
      * @param activity вью для презентера
      */
-    public void attachView(IMainActivity activity) {
+    public void attachView(@NonNull IMainActivity activity) {
         this.activityWeakReference = new WeakReference<IMainActivity>(activity);
     }
 
@@ -36,11 +38,12 @@ public class MainActivityPresenter {
                 .observeOn(iRxSchedulers.getMainThreadScheduler())
                 .doOnSubscribe(disposable -> planNotification())
                 .subscribe(aBoolean -> {
-                    if (activityWeakReference.get() != null) {
+                    IMainActivity activity = activityWeakReference.get();
+                    if (activity != null) {
                         if (aBoolean) {
                             showGameStart();
                         } else {
-                            activityWeakReference.get().startGame();
+                            activity.startGame();
                         }
                     }
                 }, throwable -> {
@@ -49,8 +52,9 @@ public class MainActivityPresenter {
     }
 
     private void showGameStart() {
-        if (activityWeakReference.get() != null) {
-            activityWeakReference.get().showStartAppFragment();
+        IMainActivity activity = activityWeakReference.get();
+        if (activity != null) {
+            activity.showStartAppFragment();
         }
     }
 

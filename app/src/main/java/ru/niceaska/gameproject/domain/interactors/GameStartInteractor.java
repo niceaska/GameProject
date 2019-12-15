@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.domain.interactors;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class GameStartInteractor {
 
     private IDataRepository dataRepository;
 
-    public GameStartInteractor(IDataRepository dataRepository) {
+    public GameStartInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 

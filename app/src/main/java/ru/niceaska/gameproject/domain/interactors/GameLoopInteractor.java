@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.domain.interactors;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class GameLoopInteractor {
 
     private IDataRepository dataRepository;
 
-    public GameLoopInteractor(IDataRepository dataRepository) {
+    public GameLoopInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 
@@ -26,7 +28,7 @@ public class GameLoopInteractor {
      * @param listItems список объектов для отображения
      * @return индекс следующего сообщения
      */
-    public int getNextIndex(List<ListItem> listItems) {
+    public int getNextIndex(@NonNull List<ListItem> listItems) {
         int nextIndex = 1;
         if (!listItems.isEmpty() && listItems.get(listItems.size() - 1) instanceof MessageItem) {
             nextIndex = ((MessageItem) listItems.get(listItems.size() - 1)).getNextMessage();
@@ -40,7 +42,7 @@ public class GameLoopInteractor {
      * @param listItems список объектов для отображения
      * @return список для отображения
      */
-    public Single<List<ListItem>> loadNewMessage(int nextIndex, List<ListItem> listItems) {
+    public Single<List<ListItem>> loadNewMessage(int nextIndex, @NonNull List<ListItem> listItems) {
         return dataRepository.loadNewGameMessage(nextIndex, listItems);
     }
 
@@ -51,8 +53,9 @@ public class GameLoopInteractor {
      * @param isNegative маркер отрицательного ответа
      * @return список объектов для отображения
      */
-    public List<ListItem> updateMessageList(MessageChoices messageChoices,
-                                            List<ListItem> listItems, boolean isNegative) {
+    public List<ListItem> updateMessageList(@NonNull MessageChoices messageChoices,
+                                            @NonNull List<ListItem> listItems,
+                                            boolean isNegative) {
         final List<ListItem> newList = new ArrayList<ListItem>(listItems);
         int answer = isNegative ? messageChoices.getNegativeMessageAnswer() : messageChoices.getPositiveMessageAnswer();
         newList.set(newList.size() - 1,

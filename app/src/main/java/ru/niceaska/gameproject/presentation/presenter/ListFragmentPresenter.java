@@ -1,5 +1,9 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,17 +29,17 @@ public class ListFragmentPresenter {
 
     private int lastIndex;
     private List<ListItem> listItems;
-    private WeakReference<MessageListView> messageListFragmentWeakReference;
+    private WeakReference<MessageListView> messageViewReference;
     private CompositeDisposable compositeDisposable;
     private GameStartInteractor gameStartInteractor;
     private GameLoopInteractor gameLoopInteractor;
     private SaveGameInteractor saveGameInteractor;
     private IRxSchedulers rxSchedulers;
 
-    public ListFragmentPresenter(GameStartInteractor gameStartInteractor,
-                                 GameLoopInteractor gameLoopInteractor,
-                                 SaveGameInteractor saveGameInteractor,
-                                 IRxSchedulers rxSchedulers) {
+    public ListFragmentPresenter(@NonNull GameStartInteractor gameStartInteractor,
+                                 @NonNull GameLoopInteractor gameLoopInteractor,
+                                 @NonNull SaveGameInteractor saveGameInteractor,
+                                 @NonNull IRxSchedulers rxSchedulers) {
         this.rxSchedulers = rxSchedulers;
         this.compositeDisposable = new CompositeDisposable();
         this.gameStartInteractor = gameStartInteractor;
@@ -46,10 +50,10 @@ public class ListFragmentPresenter {
     /**
      * Аттачит вью к презентеру
      *
-     * @param messageListFragment вью для презентера
+     * @param view вью для презентера
      */
-    public void attachView(MessageListView messageListFragment) {
-        this.messageListFragmentWeakReference = new WeakReference<>(messageListFragment);
+    public void attachView(@NonNull MessageListView view) {
+        this.messageViewReference = new WeakReference<>(view);
 
     }
 
@@ -60,6 +64,7 @@ public class ListFragmentPresenter {
     public void onGameStart() {
         compositeDisposable.add(gameStartInteractor.loadHistory()
                 .map(messageList -> {
+                    hideProgressBar();
                     listItems = messageList;
                     if (messageList.isEmpty() ||
                             !(messageList.get(messageList.size() - 1) instanceof MessageChoices)) {
@@ -68,7 +73,10 @@ public class ListFragmentPresenter {
                     return messageList;
                 })
                 .subscribeOn(rxSchedulers.getIoScheduler())
-                .doOnSubscribe(disposable -> setMessagesAnimation())
+                .doOnSubscribe(disposable -> {
+                    setMessagesAnimation();
+                    showProgressBar();
+                })
                 .observeOn(rxSchedulers.getMainThreadScheduler())
                 .subscribe(this::updateMessages, throwable -> {
                 })
@@ -76,10 +84,25 @@ public class ListFragmentPresenter {
 
     }
 
+    private void hideProgressBar() {
+        MessageListView listView = messageViewReference.get();
+        if (listView != null) {
+            listView.hideLoadingProgressBar();
+        }
+    }
+
+    private void showProgressBar() {
+        MessageListView listView = messageViewReference.get();
+        if (listView != null) {
+            listView.showLoadingProgressBar();
+        }
+    }
+
     private void setMessagesAnimation() {
         boolean isEnabled = gameStartInteractor.isMessageAnimationEnabled();
-        if (messageListFragmentWeakReference.get() != null) {
-            messageListFragmentWeakReference.get().setUpdateAnimator(isEnabled);
+        MessageListView listView = messageViewReference.get();
+        if (listView != null) {
+            listView.setUpdateAnimator(isEnabled);
         }
     }
 
@@ -94,8 +117,8 @@ public class ListFragmentPresenter {
                 }));
     }
 
-    private void updateMessages(List<ListItem> historyMessages) {
-        MessageListView fragment = messageListFragmentWeakReference.get();
+    private void updateMessages(@NonNull List<ListItem> historyMessages) {
+        MessageListView fragment = messageViewReference.get();
         if (fragment != null) {
             fragment.updateMessageList(historyMessages);
             fragment.scrollToBottom();
@@ -107,11 +130,11 @@ public class ListFragmentPresenter {
      * @param nextIndex индекс следующего сообщения для загрузки
      */
     private void gameLoop(final int nextIndex) {
-        if (listItems != null && nextIndex < 120) {
+        if (listItems != null && nextIndex < 192) {
             compositeDisposable.add(gameLoopInteractor.loadNewMessage(nextIndex, listItems)
                     .subscribeOn(rxSchedulers.getIoScheduler())
                     .doOnSubscribe(disposable -> {
-                        MessageListView fragment = messageListFragmentWeakReference.get();
+                        MessageListView fragment = messageViewReference.get();
                         if (fragment != null) {
                             fragment.showUserTyping();
                             fragment.showAnimation();
@@ -120,8 +143,8 @@ public class ListFragmentPresenter {
                     .delay(3, TimeUnit.SECONDS)
                     .observeOn(rxSchedulers.getMainThreadScheduler())
                     .subscribe((items) -> {
-                        MessageListView listFragment = messageListFragmentWeakReference.get();
                         listItems = items;
+                        MessageListView listFragment = messageViewReference.get();
                         if (listFragment != null) {
                             listFragment.updateMessageList(items);
                             listFragment.scrollToBottom();
@@ -133,20 +156,21 @@ public class ListFragmentPresenter {
                             }
                         }
                     }, throwable -> {
+                        Log.d("GAME", "gameLoop: " + throwable.getMessage());
                         clearTypingAnimation();
                     }));
         }
     }
 
     private void clearTypingAnimation() {
-        MessageListView listView = messageListFragmentWeakReference.get();
+        MessageListView listView = messageViewReference.get();
         if (listView != null) {
             listView.hideUserTyping();
             listView.clearAnimation();
         }
     }
 
-    private void checkGameState(List<ListItem> itemlist, boolean isGameStopped) {
+    private void checkGameState(@NonNull List<ListItem> itemlist, boolean isGameStopped) {
         this.listItems = itemlist;
         if (!isGameStopped) {
             gameLoop(gameLoopInteractor.getNextIndex(itemlist));
@@ -158,7 +182,7 @@ public class ListFragmentPresenter {
      * @param choice тип выбора
      * @param listItems список элементов ресайклера
      */
-    public void changeListOnClick(Choice choice, List<ListItem> listItems) {
+    public void changeListOnClick(@NonNull Choice choice, @NonNull List<ListItem> listItems) {
         switch (choice) {
             case NEGATIVE:
                 negativeChoiceCallback(listItems);
@@ -171,8 +195,8 @@ public class ListFragmentPresenter {
         }
     }
 
-    private void positiveChoiceCallback(List<ListItem> listItems) {
-        MessageListView messageListView = messageListFragmentWeakReference.get();
+    private void positiveChoiceCallback(@NonNull List<ListItem> listItems) {
+        MessageListView messageListView = messageViewReference.get();
         if (messageListView != null && !listItems.isEmpty()) {
             final Object item = listItems.get(listItems.size() - 1);
             if (item instanceof MessageChoices) {
@@ -185,8 +209,8 @@ public class ListFragmentPresenter {
         }
     }
 
-    private void negativeChoiceCallback(List<ListItem> listItems) {
-        MessageListView messageListView = messageListFragmentWeakReference.get();
+    private void negativeChoiceCallback(@NonNull List<ListItem> listItems) {
+        MessageListView messageListView = messageViewReference.get();
         if (messageListView != null && !listItems.isEmpty()) {
             final Object item = listItems.get(listItems.size() - 1);
             if (item instanceof MessageChoices) {
@@ -203,7 +227,7 @@ public class ListFragmentPresenter {
      * Сохранить прогресс игрока в базу данных
      * @param itemList список элементов ресайклера
      */
-    public void save(List<ListItem> itemList) {
+    public void save(@NonNull List<ListItem> itemList) {
         compositeDisposable.add(saveGameInteractor.saveGame(lastIndex, itemList)
                 .subscribeOn(rxSchedulers.getIoScheduler())
                 .subscribe());
@@ -218,7 +242,7 @@ public class ListFragmentPresenter {
      */
     public void detachView() {
         clearDisposable();
-        messageListFragmentWeakReference.clear();
+        messageViewReference.clear();
     }
 
     public void clearDisposable() {

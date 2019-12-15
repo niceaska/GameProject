@@ -32,7 +32,7 @@ public class SaveMessageConverter {
                 MessageChoices messageChoices = messageItem.getChoices();
                 if (messageChoices != null) {
                     choices = new Choices(
-                            messageChoices.getPostiveChoiceLabel(),
+                            messageChoices.getPositiveChoiceLabel(),
                             messageChoices.getNegativeChoiceLabel(),
                             messageChoices.getPositiveChoice(),
                             messageChoices.getNegativeChoice(),

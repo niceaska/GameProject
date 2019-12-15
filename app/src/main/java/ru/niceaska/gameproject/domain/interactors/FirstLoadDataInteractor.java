@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.domain.interactors;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -13,7 +15,7 @@ public class FirstLoadDataInteractor {
 
     private IDataRepository dataRepository;
 
-    public FirstLoadDataInteractor(IDataRepository dataRepository) {
+    public FirstLoadDataInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 

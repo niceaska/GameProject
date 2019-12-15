@@ -28,7 +28,7 @@ public class MessageConverter {
             MessageChoices messageChoices = null;
             if (choices != null) {
                 messageChoices = new MessageChoices(
-                        choices.getPostiveChoiceLabel(),
+                        choices.getPositiveChoiceLabel(),
                         choices.getNegativeChoiceLabel(),
                         choices.getPositiveChoice(),
                         choices.getNegativeChoice(),
@@ -56,7 +56,7 @@ public class MessageConverter {
         MessageChoices messageChoices = null;
         if (choices != null) {
             messageChoices = new MessageChoices(
-                    choices.getPostiveChoiceLabel(),
+                    choices.getPositiveChoiceLabel(),
                     choices.getNegativeChoiceLabel(),
                     choices.getPositiveChoice(),
                     choices.getNegativeChoice(),

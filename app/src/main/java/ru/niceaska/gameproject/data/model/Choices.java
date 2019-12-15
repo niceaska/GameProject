@@ -9,8 +9,8 @@ import com.google.common.base.Objects;
 public class Choices {
 
 
-    @ColumnInfo(name = "postive_label")
-    private String postiveChoiceLabel;
+    @ColumnInfo(name = "positive_label")
+    private String positiveChoiceLabel;
     @ColumnInfo(name = "negative_label")
     private String negativeChoiceLabel;
     @ColumnInfo(name = "postive_choice")
@@ -22,9 +22,9 @@ public class Choices {
     @ColumnInfo(name = "negative_answer")
     private int negativeMessageAnswer;
 
-    public Choices(String postiveChoiceLabel, String negativeChoiceLabel, String positiveChoice,
+    public Choices(String positiveChoiceLabel, String negativeChoiceLabel, String positiveChoice,
                    String negativeChoice, int positiveMessageAnswer, int negativeMessageAnswer) {
-        this.postiveChoiceLabel = postiveChoiceLabel;
+        this.positiveChoiceLabel = positiveChoiceLabel;
         this.negativeChoiceLabel = negativeChoiceLabel;
         this.positiveChoice = positiveChoice;
         this.negativeChoice = negativeChoice;
@@ -33,8 +33,8 @@ public class Choices {
     }
 
 
-    public String getPostiveChoiceLabel() {
-        return postiveChoiceLabel;
+    public String getPositiveChoiceLabel() {
+        return positiveChoiceLabel;
     }
 
 
@@ -73,7 +73,7 @@ public class Choices {
         Choices choices = (Choices) o;
         return positiveMessageAnswer == choices.positiveMessageAnswer &&
                 negativeMessageAnswer == choices.negativeMessageAnswer &&
-                Objects.equal(postiveChoiceLabel, choices.postiveChoiceLabel) &&
+                Objects.equal(positiveChoiceLabel, choices.positiveChoiceLabel) &&
                 Objects.equal(negativeChoiceLabel, choices.negativeChoiceLabel) &&
                 Objects.equal(positiveChoice, choices.positiveChoice) &&
                 Objects.equal(negativeChoice, choices.negativeChoice);
@@ -81,7 +81,7 @@ public class Choices {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(postiveChoiceLabel, negativeChoiceLabel, positiveChoice,
+        return Objects.hashCode(positiveChoiceLabel, negativeChoiceLabel, positiveChoice,
                 negativeChoice, positiveMessageAnswer, negativeMessageAnswer);
     }
 }

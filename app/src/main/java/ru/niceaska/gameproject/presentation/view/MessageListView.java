@@ -11,6 +11,9 @@ public interface MessageListView {
     void clearAnimation();
     void scrollToBottom();
 
+    void showLoadingProgressBar();
+
+    void hideLoadingProgressBar();
     void setUpdateAnimator(boolean isMesageAnimation);
     void updateMessageList(List<ListItem> newList);
 }

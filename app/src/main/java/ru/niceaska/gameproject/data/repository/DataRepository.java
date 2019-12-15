@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -43,23 +45,23 @@ public class DataRepository implements IDataRepository {
     private Context context;
     private MessageConverter messageConverter = new MessageConverter();
     private SaveMessageConverter saveMessageConverter = new SaveMessageConverter();
-    private InputStreamReader open;
+    private InputStreamReader reader;
     private SharedPreferences preferences;
 
 
-    public DataRepository(AppDatabase database,
-                          Context context,
-                          SharedPreferences preferences) {
+    public DataRepository(@NonNull AppDatabase database,
+                          @NonNull Context context,
+                          @NonNull SharedPreferences preferences) {
         this.database = database;
         this.context = context;
         this.preferences = preferences;
     }
 
-    private Completable insertUserInformation(User user) {
+    private Completable insertUserInformation(@NonNull User user) {
         return Completable.fromRunnable(() -> database.getUserDao().insert(user));
     }
 
-    private Completable insertMessages(List<GameMessage> messageList) {
+    private Completable insertMessages(@NonNull List<GameMessage> messageList) {
         return database.getGameMessgeDao().insertMessge(messageList);
     }
 
@@ -76,7 +78,7 @@ public class DataRepository implements IDataRepository {
      * @return Completable совершенного действия
      */
     @Override
-    public Completable saveUserData(int lastIndex, List<ListItem> messageItems) {
+    public Completable saveUserData(int lastIndex, @NonNull List<ListItem> messageItems) {
         UserPojo userPojo = new UserPojo(USER_ID, USER_NAME, lastIndex);
         User user = new User(userPojo, saveMessageConverter.convertToHistory(messageItems));
         return insertUserInformation(user);
@@ -90,7 +92,7 @@ public class DataRepository implements IDataRepository {
      * @return сингл совершенного действия
      */
     @Override
-    public Single<List<ListItem>> loadNewGameMessage(int nextIndex, List<ListItem> listItems) {
+    public Single<List<ListItem>> loadNewGameMessage(int nextIndex, @NonNull List<ListItem> listItems) {
         return getMessageById(nextIndex)
                 .map(gameMessage -> messageConverter.convertFromGameMessage(gameMessage))
                 .map(gameMessage -> {
@@ -112,7 +114,7 @@ public class DataRepository implements IDataRepository {
      * @return сингл совершенного действия
      */
     @Override
-    public Single<Integer> loadUserProgress(String userId) {
+    public Single<Integer> loadUserProgress(@NonNull String userId) {
         return database.getUserDao().getuserProgress(userId);
     }
 
@@ -137,12 +139,12 @@ public class DataRepository implements IDataRepository {
         return Observable.fromCallable(() -> {
             AssetManager assetManager = context.getAssets();
             InputStream is = assetManager.open(FILE_NAME);
-            open = new InputStreamReader(is);
+            reader = new InputStreamReader(is);
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<GameMessage>>() {
             }.getType();
-            return gson.<List<GameMessage>>fromJson(open, listType);
-        }).doFinally(() -> open.close())
+            return gson.<List<GameMessage>>fromJson(reader, listType);
+        }).doFinally(() -> reader.close())
                 .flatMap((gameMessages) -> insertMessages(gameMessages).toObservable());
 
     }
@@ -165,7 +167,7 @@ public class DataRepository implements IDataRepository {
      * @return сингл
      */
     @Override
-    public Single<List<MessageItem>> loadHistory(String userId) {
+    public Single<List<MessageItem>> loadHistory(@NonNull String userId) {
         return database.getUserDao().getUserById(userId)
                 .map(user -> messageConverter.convertFromHistory(user.savedMessages));
     }

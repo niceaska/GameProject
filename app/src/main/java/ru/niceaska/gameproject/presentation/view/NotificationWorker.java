@@ -35,11 +35,14 @@ public class NotificationWorker extends Worker {
     public Result doWork() {
         String title = getInputData().getString(PLAYER_AWAY_TITLE);
         String message = getInputData().getString(PLAYER_AWAY_TEXT);
-        createNotification(title, message);
-        return Result.success();
+        if (title != null && message != null) {
+            createNotification(title, message);
+            return Result.success();
+        }
+        return Result.failure();
     }
 
-    private void createNotification(String title, String text) {
+    private void createNotification(@NonNull String title, @NonNull String text) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
         String channelName = getApplicationContext().getResources().getString(R.string.app_name);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -50,7 +53,6 @@ public class NotificationWorker extends Worker {
                     NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
-
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setContentTitle(title)

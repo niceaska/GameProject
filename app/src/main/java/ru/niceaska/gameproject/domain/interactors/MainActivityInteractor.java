@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.domain.interactors;
 
+import androidx.annotation.NonNull;
+
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import ru.niceaska.gameproject.domain.IDataRepository;
@@ -11,7 +13,7 @@ public class MainActivityInteractor {
 
     private IDataRepository dataRepository;
 
-    public MainActivityInteractor(IDataRepository dataRepository) {
+    public MainActivityInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 

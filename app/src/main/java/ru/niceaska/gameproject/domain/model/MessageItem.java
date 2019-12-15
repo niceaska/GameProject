@@ -1,6 +1,7 @@
 package ru.niceaska.gameproject.domain.model;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
@@ -15,7 +16,7 @@ public class MessageItem implements ListItem {
     public MessageItem(int id, String message, boolean isGamer,
                        int nextMessage, MessageChoices choices) {
         this.id = id;
-        this.message = message;
+        this.message = Preconditions.checkNotNull(message);
         this.isGamer = isGamer;
         this.nextMessage = nextMessage;
         this.choices = choices;

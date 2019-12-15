@@ -59,7 +59,6 @@ public class StartAppPresenterTest {
         startAppPresenter.loadData();
         verify(loadDataInteractor).createUser();
         verify(startView).beginNewGame();
-        ;
 
         verifyNoMoreInteractions(startView);
     }

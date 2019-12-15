@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
+import androidx.annotation.NonNull;
+
 import java.lang.ref.WeakReference;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -9,14 +11,14 @@ import ru.niceaska.gameproject.rx.IRxSchedulers;
 
 public class StartAppPresenter {
 
-    private WeakReference<GameStartView> gameStartFragmentWeakReference;
+    private WeakReference<GameStartView> gameStartViewWeakReference;
     private FirstLoadDataInteractor firstLoadDataInteractor;
     private CompositeDisposable compositeDisposable;
     private IRxSchedulers rxSchedulers;
 
     private static final String TAG = StartAppPresenter.class.getName();
 
-    public StartAppPresenter(FirstLoadDataInteractor interactor, IRxSchedulers rxSchedulers) {
+    public StartAppPresenter(@NonNull FirstLoadDataInteractor interactor, @NonNull IRxSchedulers rxSchedulers) {
         this.firstLoadDataInteractor = interactor;
         this.rxSchedulers = rxSchedulers;
         this.compositeDisposable = new CompositeDisposable();
@@ -25,10 +27,10 @@ public class StartAppPresenter {
     /**
      * Аттачит вью к презентеру
      *
-     * @param gameStartFragment вью для презентера
+     * @param view вью для презентера
      */
-    public void attachView(GameStartView gameStartFragment) {
-        this.gameStartFragmentWeakReference = new WeakReference<>(gameStartFragment);
+    public void attachView(@NonNull GameStartView view) {
+        this.gameStartViewWeakReference = new WeakReference<>(view);
     }
 
     /**
@@ -55,15 +57,17 @@ public class StartAppPresenter {
                         },
                         () -> {
                             createUser();
-                            if (gameStartFragmentWeakReference.get() != null) {
-                                gameStartFragmentWeakReference.get().beginNewGame();
+                            GameStartView gameStartView = gameStartViewWeakReference.get();
+                            if (gameStartView != null) {
+                                gameStartView.beginNewGame();
                             }
                         }));
     }
 
     private void showError() {
-        if (gameStartFragmentWeakReference.get() != null) {
-            gameStartFragmentWeakReference.get().showErrorToast();
+        GameStartView gameStartView = gameStartViewWeakReference.get();
+        if (gameStartView != null) {
+            gameStartView.showErrorToast();
         }
     }
 
@@ -77,6 +81,6 @@ public class StartAppPresenter {
      * Деаттачит вью от презентера
      */
     public void detachView() {
-        gameStartFragmentWeakReference.clear();
+        gameStartViewWeakReference.clear();
     }
 }

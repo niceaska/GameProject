@@ -3,6 +3,7 @@ package ru.niceaska.gameproject.presentation.view.ui;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 
 /**
@@ -36,7 +37,7 @@ public class TypeWriter extends AppCompatTextView {
      * Установить текст для анимации
      * @param animatedText текст для анимации
      */
-    public void setAnimatedText(CharSequence animatedText) {
+    public void setAnimatedText(@NonNull CharSequence animatedText) {
         this.animatedText = animatedText;
     }
 }

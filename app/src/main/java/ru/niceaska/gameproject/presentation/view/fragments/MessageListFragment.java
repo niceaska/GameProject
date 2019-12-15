@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,6 +56,7 @@ public class MessageListFragment extends Fragment implements MessageListView {
     private TypeWriter typeWriter;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
     private ObjectAnimator animator;
+    private ProgressBar progressBar;
 
     public static MessageListFragment newInstance() {
 
@@ -103,6 +105,7 @@ public class MessageListFragment extends Fragment implements MessageListView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.dialog_view);
+        progressBar = view.findViewById(R.id.progress_loading);
         layoutManager = new LinearLayoutManager(
                 requireContext(), RecyclerView.VERTICAL, false
         );
@@ -138,7 +141,6 @@ public class MessageListFragment extends Fragment implements MessageListView {
     @Override
     public void hideUserTyping() {
         typeWriter.setVisibility(View.GONE);
-
     }
 
     @Override
@@ -151,6 +153,16 @@ public class MessageListFragment extends Fragment implements MessageListView {
     @Override
     public void scrollToBottom() {
         layoutManager.scrollToPosition(messagesAdapter.getItemCount() - 1);
+    }
+
+    @Override
+    public void showLoadingProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoadingProgressBar() {
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

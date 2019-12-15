@@ -138,7 +138,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                     listener.onNegativeChoice();
                 }
             });
-            buttonRight.setText(choice.getPostiveChoiceLabel());
+            buttonRight.setText(choice.getPositiveChoiceLabel());
             buttonRight.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

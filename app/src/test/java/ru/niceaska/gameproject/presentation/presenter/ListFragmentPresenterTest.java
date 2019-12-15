@@ -2,6 +2,7 @@ package ru.niceaska.gameproject.presentation.presenter;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -17,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.schedulers.TestScheduler;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.domain.interactors.GameLoopInteractor;
@@ -38,6 +38,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ListFragmentPresenterTest {
 
+    @Rule
+    public TestSchedulerRule schedulerRule = new TestSchedulerRule();
 
     @Mock
     private GameStartInteractor gameStartInteractor;
@@ -51,7 +53,7 @@ public class ListFragmentPresenterTest {
     @Mock
     private MessageListView listView;
 
-    private TestScheduler testScheduler = new TestScheduler();
+    private TestScheduler testScheduler = schedulerRule.getTestScheduler();
 
     private ListFragmentPresenter presenter;
 
@@ -73,9 +75,9 @@ public class ListFragmentPresenterTest {
         when(gameStartInteractor.isMessageAnimationEnabled()).thenReturn(true);
 
         presenter.onGameStart();
+        testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(true);
-        ;
         inOrder.verify(listView).updateMessageList(createMessageList(true));
         inOrder.verify(listView).scrollToBottom();
 
@@ -88,6 +90,7 @@ public class ListFragmentPresenterTest {
         when(gameStartInteractor.isMessageAnimationEnabled()).thenReturn(false);
 
         presenter.onGameStart();
+        testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(false);
         inOrder.verify(listView).updateMessageList(createMessageList(true));
@@ -98,27 +101,23 @@ public class ListFragmentPresenterTest {
 
     @Test
     public void onGameStart_NoChoices_AnimationOff() throws InterruptedException {
-        CountDownLatch lock = new CountDownLatch(1);
         when(gameStartInteractor.loadHistory()).thenReturn(Single.just(createMessageList(false)));
         when(gameStartInteractor.isMessageAnimationEnabled()).thenReturn(false);
         when(gameStartInteractor.loadUserProgress()).thenReturn(Single.just(4));
         when(gameLoopInteractor.loadNewMessage(Mockito.anyInt(), Mockito.anyList())).thenReturn(Single.just(createMessageList(false)));
         when(gameLoopInteractor.getNextIndex(Mockito.anyList())).thenReturn(2);
         presenter.onGameStart();
+        testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(false);
         inOrder.verify(listView).showUserTyping();
         inOrder.verify(listView).showAnimation();
-        inOrder.verify(listView).updateMessageList(Mockito.anyList());
-        inOrder.verify(listView).scrollToBottom();
-        lock.await(4, TimeUnit.SECONDS);
+        testScheduler.advanceTimeBy(4, TimeUnit.SECONDS);
+        testScheduler.triggerActions();
         inOrder.verify(listView).updateMessageList(Mockito.anyList());
         inOrder.verify(listView).scrollToBottom();
         inOrder.verify(listView).hideUserTyping();
         inOrder.verify(listView).clearAnimation();
-        inOrder.verify(listView).showUserTyping();
-        inOrder.verify(listView).showAnimation();
-        verifyNoMoreInteractions(listView);
     }
 
     @Test
@@ -130,13 +129,15 @@ public class ListFragmentPresenterTest {
         when(gameLoopInteractor.loadNewMessage(Mockito.anyInt(), Mockito.anyList())).thenReturn(Single.error(new NullPointerException()));
         when(gameLoopInteractor.getNextIndex(Mockito.anyList())).thenReturn(2);
         presenter.onGameStart();
+        testScheduler.triggerActions();
         InOrder inOrder = Mockito.inOrder(listView);
         inOrder.verify(listView).setUpdateAnimator(false);
         inOrder.verify(listView).showUserTyping();
         inOrder.verify(listView).showAnimation();
-        inOrder.verify(listView).updateMessageList(Mockito.anyList());
-        inOrder.verify(listView).scrollToBottom();
-        lock.await(4, TimeUnit.SECONDS);
+        testScheduler.advanceTimeBy(4, TimeUnit.SECONDS);
+        testScheduler.triggerActions();
+        verify(listView).updateMessageList(Mockito.anyList());
+        verify(listView).scrollToBottom();
 
         verify(listView).hideUserTyping();
         verify(listView).clearAnimation();
@@ -146,8 +147,40 @@ public class ListFragmentPresenterTest {
 
 
     @Test
-    public void changeListOnClick() {
+    public void changeListOnClick_TestEmpty() {
+        presenter.changeListOnClick(ListFragmentPresenter.Choice.NEGATIVE, new ArrayList<>());
+        verifyNoMoreInteractions(listView);
 
+        presenter.changeListOnClick(ListFragmentPresenter.Choice.POSITIVE, new ArrayList<>());
+        verifyNoMoreInteractions(listView);
+    }
+
+
+    @Test
+    public void changeListOnClick_TestRight() {
+        when(gameLoopInteractor.loadNewMessage(Mockito.anyInt(), Mockito.anyList())).thenReturn(Single.just(createMessageList(true)));
+        when(gameLoopInteractor.updateMessageList(Mockito.any(MessageChoices.class), Mockito.anyList(), Mockito.anyBoolean()))
+                .thenReturn(createMessageList(false));
+        presenter.changeListOnClick(ListFragmentPresenter.Choice.NEGATIVE, createMessageList(true));
+        InOrder inOrder = Mockito.inOrder(listView);
+        inOrder.verify(listView).updateMessageList(Mockito.anyList());
+        inOrder.verify(listView).showUserTyping();
+        inOrder.verify(listView).showAnimation();
+        verifyNoMoreInteractions(listView);
+
+    }
+
+    @Test
+    public void changeListOnClick_TestRight_Positive() {
+        when(gameLoopInteractor.loadNewMessage(Mockito.anyInt(), Mockito.anyList())).thenReturn(Single.just(createMessageList(true)));
+        when(gameLoopInteractor.updateMessageList(Mockito.any(MessageChoices.class), Mockito.anyList(), Mockito.anyBoolean()))
+                .thenReturn(createMessageList(false));
+        presenter.changeListOnClick(ListFragmentPresenter.Choice.POSITIVE, createMessageList(true));
+        InOrder inOrder = Mockito.inOrder(listView);
+        inOrder.verify(listView).updateMessageList(Mockito.anyList());
+        inOrder.verify(listView).showUserTyping();
+        inOrder.verify(listView).showAnimation();
+        verifyNoMoreInteractions(listView);
     }
 
     @Test
@@ -180,12 +213,12 @@ public class ListFragmentPresenterTest {
     private IRxSchedulers rxSchedulersTest = new IRxSchedulers() {
         @Override
         public Scheduler getMainThreadScheduler() {
-            return Schedulers.trampoline();
+            return testScheduler;
         }
 
         @Override
         public Scheduler getIoScheduler() {
-            return Schedulers.trampoline();
+            return testScheduler;
         }
     };
 

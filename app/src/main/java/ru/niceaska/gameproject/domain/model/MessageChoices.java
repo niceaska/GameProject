@@ -1,31 +1,32 @@
 package ru.niceaska.gameproject.domain.model;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
 public class MessageChoices implements ListItem {
 
-    private String postiveChoiceLabel;
+    private String positiveChoiceLabel;
     private String negativeChoiceLabel;
     private String positiveChoice;
     private String negativeChoice;
     private int positiveMessageAnswer;
     private int negativeMessageAnswer;
 
-    public MessageChoices(String postiveChoiceLabel, String negativeChoiceLabel,
+    public MessageChoices(String positiveChoiceLabel, String negativeChoiceLabel,
                           String positiveChoice, String negativeChoice,
                           int positiveMessageAnswer, int negativeMessageAnswer) {
-        this.postiveChoiceLabel = postiveChoiceLabel;
-        this.negativeChoiceLabel = negativeChoiceLabel;
-        this.positiveChoice = positiveChoice;
-        this.negativeChoice = negativeChoice;
+        this.positiveChoiceLabel = Preconditions.checkNotNull(positiveChoiceLabel);
+        this.negativeChoiceLabel = Preconditions.checkNotNull(negativeChoiceLabel);
+        this.positiveChoice = Preconditions.checkNotNull(positiveChoice);
+        this.negativeChoice = Preconditions.checkNotNull(negativeChoice);
         this.positiveMessageAnswer = positiveMessageAnswer;
         this.negativeMessageAnswer = negativeMessageAnswer;
     }
 
-    public String getPostiveChoiceLabel() {
-        return postiveChoiceLabel;
+    public String getPositiveChoiceLabel() {
+        return positiveChoiceLabel;
     }
 
 
@@ -64,7 +65,7 @@ public class MessageChoices implements ListItem {
         MessageChoices that = (MessageChoices) o;
         return positiveMessageAnswer == that.positiveMessageAnswer &&
                 negativeMessageAnswer == that.negativeMessageAnswer &&
-                Objects.equal(postiveChoiceLabel, that.postiveChoiceLabel) &&
+                Objects.equal(positiveChoiceLabel, that.positiveChoiceLabel) &&
                 Objects.equal(negativeChoiceLabel, that.negativeChoiceLabel) &&
                 Objects.equal(positiveChoice, that.positiveChoice) &&
                 Objects.equal(negativeChoice, that.negativeChoice);
@@ -72,7 +73,7 @@ public class MessageChoices implements ListItem {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(postiveChoiceLabel, negativeChoiceLabel,
+        return Objects.hashCode(positiveChoiceLabel, negativeChoiceLabel,
                 positiveChoice, negativeChoice, positiveMessageAnswer, negativeMessageAnswer);
     }
 }

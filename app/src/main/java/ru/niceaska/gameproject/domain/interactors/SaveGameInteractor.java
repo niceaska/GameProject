@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.domain.interactors;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -13,7 +15,7 @@ public class SaveGameInteractor {
 
     private IDataRepository dataRepository;
 
-    public SaveGameInteractor(IDataRepository dataRepository) {
+    public SaveGameInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
 
@@ -24,7 +26,7 @@ public class SaveGameInteractor {
      * @param listItems лист элементов ресайклера
      * @return Completable действия
      */
-    public Completable saveGame(int lastInd, List<ListItem> listItems) {
+    public Completable saveGame(int lastInd, @NonNull List<ListItem> listItems) {
         return dataRepository.saveUserData(lastInd, listItems);
     }
 
