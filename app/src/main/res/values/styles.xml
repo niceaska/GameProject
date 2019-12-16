@@ -35,4 +35,22 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="typewriter_style">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@android:color/black</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="dialog_item_style">
+        <item name="android:background">@drawable/message_body_drawbale</item>
+        <item name="android:paddingStart">@dimen/dialog_padding_left</item>
+        <item name="android:paddingEnd">@dimen/dialog_padding_right</item>
+        <item name="android:paddingTop">@dimen/dialog_padding_top</item>
+        <item name="android:paddingBottom">@dimen/dialog_padding_bottom</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:layout_marginTop">@dimen/dialog_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/dialog_margin_bottom</item>
+    </style>
+
 </resources>

@@ -11,19 +11,12 @@
         android:id="@+id/text_message_body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/message_body_drawbale"
-        android:paddingStart="@dimen/dialog_padding_left"
-        android:paddingEnd="@dimen/dialog_padding_right"
-        android:paddingTop="@dimen/dialog_padding_top"
-        android:paddingBottom="@dimen/dialog_padding_bottom"
-        android:textColor="#ffffff"
-        android:layout_marginTop="@dimen/dialog_margin_top"
-        android:layout_marginBottom="@dimen/dialog_margin_bottom"
         tools:text="Tetssscsdycsvcsycvsyvc"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline" />
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        style="@style/dialog_item_style" />
 
 
     <androidx.constraintlayout.widget.Guideline

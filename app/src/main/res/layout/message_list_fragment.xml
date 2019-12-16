@@ -27,17 +27,14 @@
 
     <ru.niceaska.gameproject.presentation.view.ui.TypeWriter
         android:id="@+id/textView"
-        android:layout_gravity="center"
-        android:textColor="@android:color/white"
         android:layout_width="match_parent"
-        android:background="@android:color/black"
         android:layout_height="0dp"
-        android:gravity="center"
         tools:text="Printing"
         app:layout_constraintHeight_percent="0.05"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        style="@style/typewriter_style" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
