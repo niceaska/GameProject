@@ -40,14 +40,15 @@ import ru.niceaska.gameproject.presentation.view.ui.TypeWriter;
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.NEGATIVE;
 import static ru.niceaska.gameproject.presentation.presenter.ListFragmentPresenter.Choice.POSITIVE;
 
+/**
+ * Фрагмент списка сообщений
+ */
 public class MessageListFragment extends Fragment implements MessageListView {
 
     private final int ANIMATION_DURATION = 3000;
-    private RecyclerView recyclerView;
 
     @Inject
     ListFragmentPresenter listFragmentPresenter;
-
 
     private GameComponent gameComponent;
     private AppComponent appComponent;
@@ -56,8 +57,15 @@ public class MessageListFragment extends Fragment implements MessageListView {
     private TypeWriter typeWriter;
     private MessagesAdapter messagesAdapter = new MessagesAdapter();
     private ObjectAnimator animator;
+    private RecyclerView recyclerView;
     private ProgressBar progressBar;
 
+    /**
+     * Метод для создания инстанса фрагмента
+     * Устанавливает флаг сохранения состояния в true
+     *
+     * @return фрагмент
+     */
     public static MessageListFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -116,6 +124,9 @@ public class MessageListFragment extends Fragment implements MessageListView {
         listFragmentPresenter.onGameStart();
     }
 
+    /**
+     * Показать анимацию печатания
+     */
     @Override
     public void showAnimation() {
         CharSequence startString = requireContext().getResources().getString(R.string.printing);
@@ -133,16 +144,25 @@ public class MessageListFragment extends Fragment implements MessageListView {
         animator.setDuration(ANIMATION_DURATION);
     }
 
+    /**
+     * Показать строку с информаций о печати
+     */
     @Override
     public void showUserTyping() {
         typeWriter.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Скрыть строку с информаций о печати
+     */
     @Override
     public void hideUserTyping() {
         typeWriter.setVisibility(View.GONE);
     }
 
+    /**
+     * Остановить анимацию
+     */
     @Override
     public void clearAnimation() {
         if (animator != null) {
@@ -150,21 +170,33 @@ public class MessageListFragment extends Fragment implements MessageListView {
         }
     }
 
+    /**
+     *  Прокрутить список к последнему сообщению
+     */
     @Override
     public void scrollToBottom() {
         layoutManager.scrollToPosition(messagesAdapter.getItemCount() - 1);
     }
 
+    /**
+     * Показать прогресс бар загрузки
+     */
     @Override
     public void showLoadingProgressBar() {
         progressBar.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Скрыть прогресс бар загрузки
+     */
     @Override
     public void hideLoadingProgressBar() {
         progressBar.setVisibility(View.GONE);
     }
 
+    /**
+     * Установить аниматор для элементов списка
+     */
     @Override
     public void setUpdateAnimator(boolean isMessageAnimation) {
         if (isMessageAnimation) {
@@ -189,11 +221,14 @@ public class MessageListFragment extends Fragment implements MessageListView {
     }
 
 
+    /**
+     * Обновить список элементов ресайклера
+     * @param newList новый список
+     */
     @Override
     public void updateMessageList(List<ListItem> newList) {
         messagesAdapter.updateList(newList);
     }
-
 
 
     @Override

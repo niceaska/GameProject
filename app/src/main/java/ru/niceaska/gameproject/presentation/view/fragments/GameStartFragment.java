@@ -26,6 +26,9 @@ import ru.niceaska.gameproject.presentation.presenter.StartAppPresenter;
 import ru.niceaska.gameproject.presentation.view.GameStartView;
 import ru.niceaska.gameproject.presentation.view.IMainActivity;
 
+/**
+ * Фрагмент старта приложения
+ */
 public class GameStartFragment extends Fragment implements GameStartView {
 
     @Inject
@@ -73,9 +76,12 @@ public class GameStartFragment extends Fragment implements GameStartView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         final Button startGame = view.findViewById(R.id.start_new_game);
-        startGame.setOnClickListener(v1 -> startAppPresenter.loadData());
+        startGame.setOnClickListener(v1 -> startAppPresenter.startNewGame());
     }
 
+    /**
+     * Начать новую игру
+     */
     @Override
     public void beginNewGame() {
         if (getActivity() instanceof IMainActivity) {
@@ -102,6 +108,9 @@ public class GameStartFragment extends Fragment implements GameStartView {
         flMscreenComponent = null;
     }
 
+    /**
+     * Показать тоаст с ошибкой
+     */
     @Override
     public void showErrorToast() {
         Toast.makeText(requireContext(),

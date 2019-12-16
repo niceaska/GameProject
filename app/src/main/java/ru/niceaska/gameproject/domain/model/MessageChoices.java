@@ -5,6 +5,9 @@ import com.google.common.base.Preconditions;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
+/**
+ * Модель выбора игрока для домаин слоя
+ */
 public class MessageChoices implements ListItem {
 
     private String positiveChoiceLabel;
@@ -14,6 +17,16 @@ public class MessageChoices implements ListItem {
     private int positiveMessageAnswer;
     private int negativeMessageAnswer;
 
+    /**
+     * Конструктор для создания модели
+     *
+     * @param positiveChoiceLabel   Заголовок кнопки
+     * @param negativeChoiceLabel   Заголовок второй кнопки
+     * @param positiveChoice        Сообщение игрока при выборе соответсвующей кнопки
+     * @param negativeChoice        Сообщение игрока при выборе соответсвующей кнопки
+     * @param positiveMessageAnswer номер следущего сообщения при данном выборе
+     * @param negativeMessageAnswer номер следущего сообщения при данном выборе
+     */
     public MessageChoices(String positiveChoiceLabel, String negativeChoiceLabel,
                           String positiveChoice, String negativeChoice,
                           int positiveMessageAnswer, int negativeMessageAnswer) {

@@ -9,7 +9,9 @@ import androidx.room.ForeignKey;
 
 import com.google.common.base.Objects;
 
-
+/**
+ * Класс моделька сообщений истории привязанная к игроку
+ */
 @Entity(tableName = "history",
         foreignKeys = @ForeignKey(entity = UserPojo.class,
                 parentColumns = "userId",
@@ -32,6 +34,16 @@ public class HistoryMessage {
     @Embedded
     private Choices choices;
 
+    /**
+     * Конструктор модели
+     *
+     * @param id          айди сообщения
+     * @param user        айди игрока
+     * @param message     текст сообщения
+     * @param isGamer     от кого сообщение
+     * @param nextMessage следующее сообщение
+     * @param choices     выбор если есть
+     */
     public HistoryMessage(@NonNull String id, @NonNull String user, String message,
                           boolean isGamer, int nextMessage, Choices choices) {
         this.id = id;

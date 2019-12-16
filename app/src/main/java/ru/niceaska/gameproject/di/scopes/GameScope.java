@@ -5,6 +5,9 @@ import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Scope;
 
+/**
+ * Скоуп интерактооров
+ */
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GameScope {

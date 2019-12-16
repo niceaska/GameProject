@@ -18,6 +18,11 @@ public class GameLoopInteractor {
 
     private IDataRepository dataRepository;
 
+    /**
+     * Конструкторр интерактора
+     *
+     * @param dataRepository репозиторий предоставляющий данные
+     */
     public GameLoopInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }

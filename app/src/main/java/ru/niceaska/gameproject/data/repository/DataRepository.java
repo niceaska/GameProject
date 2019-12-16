@@ -39,7 +39,7 @@ public class DataRepository implements IDataRepository {
      */
     public static final String USER_NAME = "test";
     private static final String FILE_NAME = "scenario.json";
-
+    private static final int START_MESSAGE_ID = 1;
 
     private AppDatabase database;
     private Context context;
@@ -47,7 +47,6 @@ public class DataRepository implements IDataRepository {
     private SaveMessageConverter saveMessageConverter = new SaveMessageConverter();
     private InputStreamReader reader;
     private SharedPreferences preferences;
-
 
     public DataRepository(@NonNull AppDatabase database,
                           @NonNull Context context,
@@ -178,7 +177,7 @@ public class DataRepository implements IDataRepository {
      * @return Completable
      */
     @Override
-    public Completable refreshDatabase() {
+    public Completable refreshUserProgress() {
         return Completable.fromAction(() -> database.getUserDao().delete());
     }
 
@@ -204,5 +203,15 @@ public class DataRepository implements IDataRepository {
         return preferences.getBoolean(
                 context.getString(R.string.pref_enable_anim_key), true
         );
+    }
+
+    /**
+     * Проверяет загружены ли уже сообщения в базу данных
+     *
+     * @return сингл булевого значения - true загружены false нет
+     */
+    @Override
+    public Single<Boolean> checkIfMessagesExist() {
+        return database.getGameMessgeDao().getById(START_MESSAGE_ID).map(gameMessage -> gameMessage != null);
     }
 }

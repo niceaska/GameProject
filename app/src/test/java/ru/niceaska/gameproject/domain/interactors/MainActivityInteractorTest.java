@@ -71,9 +71,9 @@ public class MainActivityInteractorTest {
 
     @Test
     public void refreshDataTest() {
-        when(dataRepository.refreshDatabase()).thenReturn(Completable.complete());
+        when(dataRepository.refreshUserProgress()).thenReturn(Completable.complete());
 
-        TestObserver testObserver = interactor.refreshData().test();
+        TestObserver testObserver = interactor.refreshUserData().test();
 
         testObserver.assertNoValues()
                 .assertNoErrors()

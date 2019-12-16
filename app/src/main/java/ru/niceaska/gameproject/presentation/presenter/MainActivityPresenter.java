@@ -62,7 +62,7 @@ public class MainActivityPresenter {
      * Запускает игру заново при выборе соответсвующего пункта меню
      */
     public void restartGame() {
-        compositeDisposable.add(activityInteracator.refreshData()
+        compositeDisposable.add(activityInteracator.refreshUserData()
                 .subscribeOn(iRxSchedulers.getIoScheduler())
                 .observeOn(iRxSchedulers.getMainThreadScheduler())
                 .subscribe(this::gameRun)

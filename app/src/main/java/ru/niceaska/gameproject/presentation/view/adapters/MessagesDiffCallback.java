@@ -7,6 +7,9 @@ import java.util.List;
 import ru.niceaska.gameproject.data.model.ListItem;
 import ru.niceaska.gameproject.domain.model.MessageItem;
 
+/**
+ * Diffutil для сравнения сообщений
+ */
 public class MessagesDiffCallback extends DiffUtil.Callback {
 
     private final List<ListItem> oldList;

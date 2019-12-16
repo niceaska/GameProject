@@ -117,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 .commit();
     }
 
+    /**
+     * Запланировать уведомления прм долгом незапуске игры
+     */
     @Override
     public void planningNotification() {
         clearNotifications();
@@ -132,12 +135,18 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         workManager.enqueue(workRequest);
     }
 
+    /**
+     * Удалить запланированные уведомления
+     */
     @Override
     public void clearNotifications() {
         workManager = WorkManager.getInstance(MainActivity.this);
         workManager.cancelAllWork();
     }
 
+    /**
+     * Показать фрагмент старта игры
+     */
     @Override
     public void showStartAppFragment() {
         getSupportFragmentManager()

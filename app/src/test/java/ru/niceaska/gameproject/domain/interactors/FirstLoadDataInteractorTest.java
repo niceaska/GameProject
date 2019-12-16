@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import ru.niceaska.gameproject.domain.IDataRepository;
 
@@ -32,7 +33,7 @@ public class FirstLoadDataInteractorTest {
     }
 
     @Test
-    public void firstLoadData() {
+    public void firstLoadDataTest() {
         when(dataRepository.firstLoadData()).thenReturn(Observable.just(new ArrayList()));
 
         TestObserver testObserver = interactor.firstLoadData().test();
@@ -43,7 +44,7 @@ public class FirstLoadDataInteractorTest {
     }
 
     @Test
-    public void createUser() {
+    public void createUserTest() {
         when(dataRepository.createUser()).thenReturn(Completable.complete());
         TestObserver testObserver = interactor.createUser().test();
 
@@ -53,4 +54,24 @@ public class FirstLoadDataInteractorTest {
 
         testObserver.dispose();
     }
+
+    @Test
+    public void checkIfExist() {
+        when(dataRepository.checkIfMessagesExist()).thenReturn(Single.just(true));
+        TestObserver testObserverTrue = interactor.checkIfMessagesExist().test();
+
+        testObserverTrue.assertValueCount(1)
+                .assertNoErrors();
+
+        testObserverTrue.dispose();
+
+        when(dataRepository.checkIfMessagesExist()).thenReturn(Single.just(false));
+        TestObserver testObserverFalse = interactor.checkIfMessagesExist().test();
+
+        testObserverFalse.assertValueCount(1)
+                .assertNoErrors();
+
+        testObserverFalse.dispose();
+    }
+
 }

@@ -8,8 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import ru.niceaska.gameproject.presentation.view.adapters.MessagesAdapter;
 
+/**
+ * Item Animator для анимирования элементов списка
+ */
 public class MessageAppearItemAnimator extends DefaultItemAnimator {
 
+    /**
+     * Анимирует добавление в список
+     *
+     * @param holder холдер списка
+     * @return булевое значение включена ли анимация
+     */
     @Override
     public boolean animateAdd(RecyclerView.ViewHolder holder) {
         if (holder instanceof MessagesAdapter.MessageViewHolder) {
@@ -29,7 +38,11 @@ public class MessageAppearItemAnimator extends DefaultItemAnimator {
         return super.animateAdd(holder);
     }
 
-
+    /**
+     * Анимирует удаление из списка
+     * @param holder холдер списка
+     * @return булевое значение включена ли анимация
+     */
     @Override
     public boolean animateRemove(RecyclerView.ViewHolder holder) {
         if (holder instanceof MessagesAdapter.ButtonChoicesViewHolder) {

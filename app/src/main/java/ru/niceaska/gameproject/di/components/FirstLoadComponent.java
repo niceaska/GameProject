@@ -5,6 +5,9 @@ import ru.niceaska.gameproject.di.modules.FirstLoadModule;
 import ru.niceaska.gameproject.di.scopes.GameScope;
 import ru.niceaska.gameproject.domain.interactors.FirstLoadDataInteractor;
 
+/**
+ * Компонент интерактора загрузки данных
+ */
 @Component(dependencies = AppComponent.class, modules = {FirstLoadModule.class})
 @GameScope
 public interface FirstLoadComponent {

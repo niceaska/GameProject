@@ -15,6 +15,11 @@ public class SaveGameInteractor {
 
     private IDataRepository dataRepository;
 
+    /**
+     * Конструкторр интерактора
+     *
+     * @param dataRepository репозиторий предоставляющий данные
+     */
     public SaveGameInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }

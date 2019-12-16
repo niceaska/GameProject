@@ -1,6 +1,7 @@
 package ru.niceaska.gameproject.presentation.presenter;
 
 import androidx.annotation.NonNull;
+import androidx.room.EmptyResultSetException;
 
 import java.lang.ref.WeakReference;
 
@@ -47,21 +48,39 @@ public class StartAppPresenter {
     /**
      * Загружает и парсит данные из файла сценария
      */
-    public void loadData() {
-        compositeDisposable.add(firstLoadDataInteractor.firstLoadData().subscribeOn(rxSchedulers.getIoScheduler())
+    public void startNewGame() {
+        compositeDisposable.add(firstLoadDataInteractor.checkIfMessagesExist()
+                .subscribeOn(rxSchedulers.getIoScheduler())
+                .observeOn(rxSchedulers.getMainThreadScheduler())
+                .subscribe((aBoolean, throwable) -> {
+                    if (throwable instanceof EmptyResultSetException) {
+                        loadData();
+                    } else if (aBoolean) {
+                        beginNewGame();
+                    } else {
+                        loadData();
+                    }
+                }));
+    }
+
+    private void loadData() {
+        compositeDisposable.add(firstLoadDataInteractor.firstLoadData()
+                .subscribeOn(rxSchedulers.getIoScheduler())
                 .observeOn(rxSchedulers.getMainThreadScheduler())
                 .doOnError(throwable -> showError())
                 .subscribe(o -> {
                         },
                         throwable -> {
                         },
-                        () -> {
-                            createUser();
-                            GameStartView gameStartView = gameStartViewWeakReference.get();
-                            if (gameStartView != null) {
-                                gameStartView.beginNewGame();
-                            }
-                        }));
+                        this::beginNewGame));
+    }
+
+    private void beginNewGame() {
+        createUser();
+        GameStartView gameStartView = gameStartViewWeakReference.get();
+        if (gameStartView != null) {
+            gameStartView.beginNewGame();
+        }
     }
 
     private void showError() {

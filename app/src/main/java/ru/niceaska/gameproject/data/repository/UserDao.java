@@ -11,6 +11,9 @@ import ru.niceaska.gameproject.data.model.HistoryMessage;
 import ru.niceaska.gameproject.data.model.User;
 import ru.niceaska.gameproject.data.model.UserPojo;
 
+/**
+ * Dao для таблички игрока
+ */
 @Dao
 public abstract class UserDao {
     @Transaction

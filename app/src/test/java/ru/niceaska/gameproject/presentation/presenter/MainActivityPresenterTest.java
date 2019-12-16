@@ -104,7 +104,7 @@ public class MainActivityPresenterTest {
     public void restartGame() {
         when(interactor.checkFirstStart()).thenReturn(Single.just(true));
         when(interactor.isNotificationOn()).thenReturn(false);
-        when(interactor.refreshData()).thenReturn(Completable.complete());
+        when(interactor.refreshUserData()).thenReturn(Completable.complete());
 
         presenter.restartGame();
         InOrder inOrder = Mockito.inOrder(activity);

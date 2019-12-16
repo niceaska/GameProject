@@ -7,6 +7,9 @@ import androidx.room.PrimaryKey;
 
 import com.google.common.base.Objects;
 
+/**
+ * Модель игровой информации об игроке
+ */
 @Entity
 public class UserPojo {
 
@@ -18,6 +21,13 @@ public class UserPojo {
     @ColumnInfo(name = "progress")
     private int progress;
 
+    /**
+     * Конструктор модели
+     *
+     * @param userId   ид игрока
+     * @param name     имя игрока
+     * @param progress прогресс игрока
+     */
     public UserPojo(String userId, String name, int progress) {
         this.userId = userId;
         this.name = name;

@@ -8,6 +8,9 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import ru.niceaska.gameproject.R;
 
+/**
+ * Фрагмент настроек
+ */
 public class GamePreferenceFragment extends PreferenceFragmentCompat {
 
     @Override

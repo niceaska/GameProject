@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import ru.niceaska.gameproject.domain.IDataRepository;
 
 /**
@@ -15,6 +16,11 @@ public class FirstLoadDataInteractor {
 
     private IDataRepository dataRepository;
 
+    /**
+     * Конструкторр интерактора
+     *
+     * @param dataRepository репозиторий предоставляющий данные
+     */
     public FirstLoadDataInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
@@ -36,5 +42,13 @@ public class FirstLoadDataInteractor {
         return dataRepository.createUser();
     }
 
+    /**
+     * Проверяет существует ли уже таблица с сообщениями
+     *
+     * @return сингл булевого значения - существует ли таблица
+     */
+    public Single<Boolean> checkIfMessagesExist() {
+        return dataRepository.checkIfMessagesExist();
+    }
 }
 

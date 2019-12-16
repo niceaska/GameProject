@@ -5,6 +5,9 @@ import com.google.common.base.Preconditions;
 
 import ru.niceaska.gameproject.data.model.ListItem;
 
+/**
+ * Модель домаин слоя для сообщения игры
+ */
 public class MessageItem implements ListItem {
 
     private int id;
@@ -13,6 +16,15 @@ public class MessageItem implements ListItem {
     private int nextMessage;
     private MessageChoices choices;
 
+    /**
+     * Конструктор модели
+     *
+     * @param id          айди сообщения
+     * @param message     текст сообщения
+     * @param isGamer     сообщения игрока или же игры
+     * @param nextMessage айди следующего сообщения
+     * @param choices     выбор (если есть)
+     */
     public MessageItem(int id, String message, boolean isGamer,
                        int nextMessage, MessageChoices choices) {
         this.id = id;

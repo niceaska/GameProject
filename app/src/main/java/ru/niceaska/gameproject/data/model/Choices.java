@@ -5,6 +5,9 @@ import androidx.room.Entity;
 
 import com.google.common.base.Objects;
 
+/**
+ * Модель выбора игрока
+ */
 @Entity
 public class Choices {
 
@@ -22,6 +25,16 @@ public class Choices {
     @ColumnInfo(name = "negative_answer")
     private int negativeMessageAnswer;
 
+    /**
+     * Конструктор для создания модели
+     *
+     * @param positiveChoiceLabel   Заголовок кнопки
+     * @param negativeChoiceLabel   Заголовок второй кнопки
+     * @param positiveChoice        Сообщение игрока при выборе соответсвующей кнопки
+     * @param negativeChoice        Сообщение игрока при выборе соответсвующей кнопки
+     * @param positiveMessageAnswer номер следущего сообщения при данном выборе
+     * @param negativeMessageAnswer номер следущего сообщения при данном выборе
+     */
     public Choices(String positiveChoiceLabel, String negativeChoiceLabel, String positiveChoice,
                    String negativeChoice, int positiveMessageAnswer, int negativeMessageAnswer) {
         this.positiveChoiceLabel = positiveChoiceLabel;

@@ -7,12 +7,21 @@ import com.google.common.base.Objects;
 
 import java.util.List;
 
+/**
+ * Класс модель игрока
+ */
 public class User {
     @Embedded
     public UserPojo userPojo;
     @Relation(parentColumn = "userId", entity = HistoryMessage.class, entityColumn = "user")
     public List<HistoryMessage> savedMessages;
 
+    /**
+     * Конструктор модели
+     *
+     * @param userPojo      информация об игроке и его прогрессе
+     * @param savedMessages история сообщений
+     */
     public User(UserPojo userPojo, List<HistoryMessage> savedMessages) {
         this.userPojo = userPojo;
         this.savedMessages = savedMessages;

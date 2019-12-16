@@ -11,9 +11,12 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import ru.niceaska.gameproject.data.model.GameMessage;
 
-
+/**
+ * Дао для игровых сообщений
+ */
 @Dao
 public interface GameMessgesDao {
+
     @Query("SELECT * from message")
     List<GameMessage> getAllMessges();
 
@@ -26,3 +29,4 @@ public interface GameMessgesDao {
     @Insert
     Completable insertMessge(List<GameMessage> gameMessages);
 }
+

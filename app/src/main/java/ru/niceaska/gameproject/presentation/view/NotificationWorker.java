@@ -30,6 +30,12 @@ public class NotificationWorker extends Worker {
         super(context, workerParams);
     }
 
+    /**
+     * Получает сообщение и заголовок и создает уведомление
+     *
+     * @return Result.success() при успехе и Result.failure()
+     * при возникновении ошибки
+     */
     @NonNull
     @Override
     public Result doWork() {

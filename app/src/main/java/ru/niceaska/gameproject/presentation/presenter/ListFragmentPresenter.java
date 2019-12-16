@@ -17,6 +17,9 @@ import ru.niceaska.gameproject.domain.model.MessageChoices;
 import ru.niceaska.gameproject.presentation.view.MessageListView;
 import ru.niceaska.gameproject.rx.IRxSchedulers;
 
+/**
+ * Презентер списка сообщений
+ */
 public class ListFragmentPresenter {
 
     /**
@@ -36,6 +39,14 @@ public class ListFragmentPresenter {
     private SaveGameInteractor saveGameInteractor;
     private IRxSchedulers rxSchedulers;
 
+    /**
+     * Конструктор презентера
+     *
+     * @param gameStartInteractor интерактор старта игры
+     * @param gameLoopInteractor  интерактор основного цикла игры
+     * @param saveGameInteractor  интерактор сохранения игры
+     * @param rxSchedulers        шедулеры rxjava
+     */
     public ListFragmentPresenter(@NonNull GameStartInteractor gameStartInteractor,
                                  @NonNull GameLoopInteractor gameLoopInteractor,
                                  @NonNull SaveGameInteractor saveGameInteractor,
@@ -54,7 +65,6 @@ public class ListFragmentPresenter {
      */
     public void attachView(@NonNull MessageListView view) {
         this.messageViewReference = new WeakReference<>(view);
-
     }
 
     /**
@@ -123,7 +133,7 @@ public class ListFragmentPresenter {
      * @param nextIndex индекс следующего сообщения для загрузки
      */
     private void gameLoop(final int nextIndex) {
-        if (listItems != null && nextIndex < 192) {
+        if (listItems != null) {
             compositeDisposable.add(gameLoopInteractor.loadNewMessage(nextIndex, listItems)
                     .subscribeOn(rxSchedulers.getIoScheduler())
                     .doOnSubscribe(disposable -> {
@@ -239,6 +249,9 @@ public class ListFragmentPresenter {
         messageViewReference.clear();
     }
 
+    /**
+     * Отчищает диспосаблс
+     */
     public void clearDisposable() {
         compositeDisposable.clear();
     }

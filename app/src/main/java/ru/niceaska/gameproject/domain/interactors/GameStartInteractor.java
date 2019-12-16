@@ -19,6 +19,11 @@ public class GameStartInteractor {
 
     private IDataRepository dataRepository;
 
+    /**
+     * Конструкторр интерактора
+     *
+     * @param dataRepository репозиторий предоставляющий данные
+     */
     public GameStartInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }

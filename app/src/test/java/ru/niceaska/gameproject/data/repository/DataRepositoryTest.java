@@ -92,8 +92,6 @@ public class DataRepositoryTest {
                 .assertValueCount(1);
 
         testObserver.dispose();
-
-
     }
 
     private GameMessage getGameMessage() {
@@ -201,7 +199,7 @@ public class DataRepositoryTest {
         UserDao userDao = Mockito.mock(UserDao.class);
         when(database.getUserDao()).thenReturn(userDao);
         doNothing().when(userDao).delete();
-        TestObserver testObserver = datatRepository.refreshDatabase()
+        TestObserver testObserver = datatRepository.refreshUserProgress()
                 .test();
 
         testObserver.assertValueCount(0)
@@ -224,5 +222,18 @@ public class DataRepositoryTest {
         when(context.getString(Mockito.anyInt())).thenReturn("");
         when(preferences.getBoolean(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(true);
         assertTrue(datatRepository.isMessageAnimationEnabled());
+    }
+
+    @Test
+    public void checkIfExistTest() {
+        GameMessgesDao gameMessgesDao = Mockito.mock(GameMessgesDao.class);
+        when(database.getGameMessgeDao()).thenReturn(gameMessgesDao);
+        when(gameMessgesDao.getById(Mockito.anyLong())).thenReturn(Single.just(getGameMessage()));
+
+        final TestObserver<Boolean> testObserverTrue = datatRepository.checkIfMessagesExist().test();
+        testObserverTrue.assertNoErrors()
+                .assertResult(true)
+                .assertValueCount(1);
+        testObserverTrue.dispose();
     }
 }

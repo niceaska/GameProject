@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import ru.niceaska.gameproject.domain.interactors.FirstLoadDataInteractor;
 import ru.niceaska.gameproject.presentation.view.GameStartView;
@@ -44,19 +45,32 @@ public class StartAppPresenterTest {
     @Test()
     public void loadDataTest_Error() throws Exception {
         startAppPresenter.attachView(startView);
+        when(loadDataInteractor.checkIfMessagesExist()).thenReturn(Single.just(false));
         when(loadDataInteractor.firstLoadData()).thenReturn(Observable.error(new NullPointerException()));
 
-        startAppPresenter.loadData();
+        startAppPresenter.startNewGame();
         verify(startView).showErrorToast();
 
         verifyNoMoreInteractions(startView);
     }
 
     @Test
-    public void loadDataTest() {
+    public void startNewGameTest() {
+        when(loadDataInteractor.checkIfMessagesExist()).thenReturn(Single.just(false));
         when(loadDataInteractor.createUser()).thenReturn(Completable.complete());
         when(loadDataInteractor.firstLoadData()).thenReturn(Observable.just(new ArrayList()));
-        startAppPresenter.loadData();
+        startAppPresenter.startNewGame();
+        verify(loadDataInteractor).createUser();
+        verify(startView).beginNewGame();
+
+        verifyNoMoreInteractions(startView);
+    }
+
+    @Test
+    public void startNewGameTest_idTableExist() {
+        when(loadDataInteractor.checkIfMessagesExist()).thenReturn(Single.just(true));
+        when(loadDataInteractor.createUser()).thenReturn(Completable.complete());
+        startAppPresenter.startNewGame();
         verify(loadDataInteractor).createUser();
         verify(startView).beginNewGame();
 
@@ -66,7 +80,7 @@ public class StartAppPresenterTest {
     @Test(expected = NullPointerException.class)
     public void detachTest() {
         startAppPresenter.detachView();
-        startAppPresenter.loadData();
+        startAppPresenter.startNewGame();
     }
 
 

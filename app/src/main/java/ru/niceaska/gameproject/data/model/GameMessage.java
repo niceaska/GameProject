@@ -1,5 +1,7 @@
 package ru.niceaska.gameproject.data.model;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
@@ -9,6 +11,9 @@ import com.google.common.base.Objects;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Моделька игрового сообщения для базы данных
+ */
 @Entity(tableName = "message")
 public class GameMessage {
 
@@ -31,7 +36,20 @@ public class GameMessage {
     @Embedded
     private Choices choices;
 
-    public GameMessage(int id, String message, boolean isGamer, int nextMessage, Choices choices) {
+    /**
+     * Конструктор модели
+     *
+     * @param id          айди сообщения
+     * @param message     текст сообщения
+     * @param isGamer     сообщения игрока или же игры
+     * @param nextMessage айди следующего сообщения
+     * @param choices     выбор (если есть)
+     */
+    public GameMessage(int id,
+                       @NonNull String message,
+                       boolean isGamer,
+                       int nextMessage,
+                       @Nullable Choices choices) {
         this.id = id;
         this.message = message;
         this.isGamer = isGamer;

@@ -13,6 +13,11 @@ public class MainActivityInteractor {
 
     private IDataRepository dataRepository;
 
+    /**
+     * Конструкторр интерактора
+     *
+     * @param dataRepository репозиторий предоставляющий данные
+     */
     public MainActivityInteractor(@NonNull IDataRepository dataRepository) {
         this.dataRepository = dataRepository;
     }
@@ -38,7 +43,8 @@ public class MainActivityInteractor {
      * Рефрешит прогресс при новом старте игры
      * @return Completable действия
      */
-    public Completable refreshData() {
-        return dataRepository.refreshDatabase();
+    public Completable refreshUserData() {
+        return dataRepository.refreshUserProgress();
     }
+
 }
